@@ -1,10 +1,23 @@
-[{
-  "modid": "additionalpipes",
-  "name": "Additional Pipes",
-  "version": "${version}",
-  "url": "https://github.com/tcooc/AdditionalPipesBC/",
-  "updateUrl": "",
-  "description": "Teleport, insertion, extraction, and other pipes.",
-  "credits": "Credits to Zeldo and DaStormBringer.",
-  "authorList": [ "Zeldo", "DaStormBringer", "MultipleMonomials", "Additional Pipes Contributors" ]
-}]
+{
+	"modListVersion": 2,
+	"modList": [{
+		"modid": "${modId}",
+		"name": "${modName}",
+		"description": "Teleport, insertion, extraction, and other pipes.",
+		"version": "${modVersion}",
+		"mcversion": "${minecraftVersion}",
+		"url": "https://github.com/MrFuzzihead/AdditionalPipes-Legacy",
+		"updateUrl": "https://github.com/MrFuzzihead/AdditionalPipes-Legacy/releases/latest",
+		"authorList": [
+		  "MrFuzzihead"
+		],
+		"credits": "Credits to Zeldo and DaStormBringer.",
+		"logoFile": "",
+		"screenshots": [],
+		"parent": "",
+		"requiredMods": [],
+		"dependencies": [],
+		"dependants": [],
+		"useDependencyInformation": false
+	}]
+}
