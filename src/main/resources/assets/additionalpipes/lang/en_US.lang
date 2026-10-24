@@ -1,7 +1,5 @@
 tile.TeleportTether.name=Teleport Tether
 item.PipeItemsPriorityInsertion.name=Priority Insertion Pipe
-item.PipeItemsAdvancedInsertion.name=[Deprecated] Insertion Transport Pipe
-item.PipeItemsAdvancedWood.name=Adv. Wooden Transport Pipe
 item.PipeItemsGravityFeed.name=Gravity Feed Transport Pipe
 item.PipeItemsDistributor.name=Distribution Transport Pipe
 item.PipeItemsClosed.name=Closed Transport Pipe
@@ -23,7 +21,6 @@ tile.teleportTether.name=Teleport Tether
 
 gui.pipeItemsDistributor=Distribution Pipe
 gui.pipeItemsPriorityInsertion=Priority Insertion Pipe
-gui.PipeItemsAdvancedWood=Advanced Wooden Pipe
 gui.jeweled_pipe=Jeweled Pipe
 
 #tab names for the Jeweled Pipe GUI

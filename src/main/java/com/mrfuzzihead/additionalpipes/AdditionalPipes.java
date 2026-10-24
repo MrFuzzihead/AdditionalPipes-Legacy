@@ -28,8 +28,6 @@ import buildcraft.additionalpipes.item.ItemDogDeaggravator;
 import buildcraft.additionalpipes.network.PacketHandler;
 import buildcraft.additionalpipes.pipes.APPipe;
 import buildcraft.additionalpipes.pipes.PipeItemsAddition;
-import buildcraft.additionalpipes.pipes.PipeItemsAdvancedInsertion;
-import buildcraft.additionalpipes.pipes.PipeItemsAdvancedWood;
 import buildcraft.additionalpipes.pipes.PipeItemsClosed;
 import buildcraft.additionalpipes.pipes.PipeItemsDistributor;
 import buildcraft.additionalpipes.pipes.PipeItemsGravityFeed;
@@ -110,12 +108,8 @@ public class AdditionalPipes {
     public Item pipeLiquidsRedstone;
     // Redstone
     public Item pipeItemsRedStone;
-    // Advanced Insertion
-    public Item pipeItemsAdvancedInsertion;
-    // Advanced Insertion
+    // Addition
     public Item pipeItemsAddition;
-    // Advanced Wood
-    public Item pipeItemsAdvancedWood;
     // Gravity Feed
     public Item pipeItemsGravityFeed;
     // Distributor
@@ -418,11 +412,7 @@ public class AdditionalPipes {
             'g',
             "blockGlass");
 
-        // Advanced Insertion Pipe
-        pipeItemsAdvancedInsertion = PipeCreator
-            .createPipeAndRecipe(8, PipeItemsAdvancedInsertion.class, false, "IgI", 'I', "gearIron", 'g', "blockGlass");
-
-        // Advanced Insertion Pipe
+        // Addition Pipe
         pipeItemsAddition = PipeCreator.createPipeAndRecipe(
             1,
             PipeItemsAddition.class,
@@ -431,7 +421,7 @@ public class AdditionalPipes {
             "RIR",
             " R ",
             'I',
-            pipeItemsAdvancedInsertion,
+            BuildCraftTransport.pipeItemsClay,
             'R',
             "dustRedstone");
 
@@ -440,11 +430,7 @@ public class AdditionalPipes {
             PipeItemsPriorityInsertion.class,
             true,
             pipeItemsDistributor,
-            pipeItemsAdvancedInsertion);
-
-        // Advanced Wooden Pipe
-        pipeItemsAdvancedWood = PipeCreator
-            .createPipeAndRecipe(8, PipeItemsAdvancedWood.class, false, "WgW", 'W', "gearWood", 'g', "blockGlass");
+            BuildCraftTransport.pipeItemsClay);
 
         // Gravity Feed Pipe
         pipeItemsGravityFeed = PipeCreator.createPipeAndRecipe(

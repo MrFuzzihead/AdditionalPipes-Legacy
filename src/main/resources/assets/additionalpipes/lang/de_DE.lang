@@ -1,8 +1,6 @@
 tile.TeleportTether.name=Teleport-Synchronisierer
 item.PipeLiquidsRedstone.name=Redstone-Wasserrohr
 item.PipeItemsRedstone.name=Redstone-Transportrohr
-item.PipeItemsAdvancedInsertion.name=Fortgeschr. Einfügungs-Transportrohr
-item.PipeItemsAdvancedWood.name=Fortgeschr. Hölzernes Transportrohr
 item.PipeItemsDistributor.name=Verteilungs-Transportrohr
 item.PipeItemsClosed.name=Geschlossenes Transportrohr
 item.PipeItemsTeleport.name=Synchronisierbares Transportrohr

@@ -1,8 +1,6 @@
 #AdditionalPipes ver.4.7.6-jp by Ellen Kasacon
 tile.TeleportTether.name=テレポートテザー
 item.PipeItemsPriorityInsertion.name=分配挿入パイプ(アイテム)
-item.PipeItemsAdvancedInsertion.name=[非推奨] 挿入パイプ(アイテム)
-item.PipeItemsAdvancedWood.name=木パイプ改(アイテム)
 item.PipeItemsGravityFeed.name=重力パイプ(アイテム)
 item.PipeItemsDistributor.name=分配パイプ(アイテム)
 item.PipeItemsClosed.name=閉鎖パイプ(アイテム)
@@ -24,7 +22,6 @@ tile.teleportTether.name=テレポートテザー
 
 gui.pipeItemsDistributor=分配パイプ
 gui.pipeItemsPriorityInsertion=分配挿入パイプ
-gui.PipeItemsAdvancedWood=木パイプ改
 gui.jeweled_pipe=宝石パイプ
 
 #宝石パイプGUIのタブ名

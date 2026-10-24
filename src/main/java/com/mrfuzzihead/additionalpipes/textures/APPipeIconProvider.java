@@ -29,6 +29,11 @@ public class APPipeIconProvider implements IIconProvider {
     @SideOnly(Side.CLIENT)
     public void registerIcons(IIconRegister iconRegister) {
         for (int i = 0; i < iconCount; i++) {
+            // 6/7/8 belonged to the removed Advanced Wooden and Advanced Insertion pipes.
+            // Keep the numbering stable for the remaining pipes and leave these slots empty.
+            if (i == 6 || i == 7 || i == 8) {
+                continue;
+            }
             icons[i] = iconRegister.registerIcon("additionalpipes:" + i);
         }
     }

@@ -1,8 +1,6 @@
 tile.TeleportTether.name=Atadura de Teleportación
 item.PipeLiquidsRedstone.name=Tubería de Fluidos de Piedra Roja
 item.PipeItemsRedstone.name=Tubería de Transporte de Piedra Roja
-item.PipeItemsAdvancedInsertion.name=Tubería de Transporte de Inserción
-item.PipeItemsAdvancedWood.name=Tubería de Transporte de Madera Avanzada
 item.PipeItemsDistributor.name=Tubería de Transporte de Distribución
 item.PipeItemsClosed.name=Tuberia de Transporte Cerrada
 item.PipeItemsTeleport.name=Tubería de Transporte Escalonada

@@ -1,8 +1,6 @@
 tile.TeleportTether.name=Teletransporte Tether
 item.PipeLiquidsRedstone.name=Tube de Redstone Fluida
 item.PipeItemsRedstone.name=Tubo de Transporte de Redstone
-item.PipeItemsAdvancedInsertion.name=Tubo de Inserção de Transporte
-item.PipeItemsAdvancedWood.name=Tubo de Transporte Avançado de Madeira
 item.PipeItemsDistributor.name=Tubo de Distribuição de Transporte
 item.PipeItemsClosed.name=Tubo de Transporte Fechado [WIP]
 item.PipeItemsTeleport.name=Tubo de Transporte em Fase
