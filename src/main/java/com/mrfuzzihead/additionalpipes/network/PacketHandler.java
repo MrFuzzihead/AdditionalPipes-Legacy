@@ -1,8 +1,6 @@
 package buildcraft.additionalpipes.network;
 
 import buildcraft.additionalpipes.AdditionalPipes;
-import buildcraft.additionalpipes.network.message.MessageChunkloadData;
-import buildcraft.additionalpipes.network.message.MessageChunkloadRequest;
 import buildcraft.additionalpipes.network.message.MessageDistPipe;
 import buildcraft.additionalpipes.network.message.MessageJeweledPipeOptionsClient;
 import buildcraft.additionalpipes.network.message.MessageJeweledPipeOptionsServer;
@@ -22,8 +20,6 @@ public class PacketHandler {
         INSTANCE.registerMessage(MessageDistPipe.class, MessageDistPipe.class, 0, Side.SERVER);
         INSTANCE.registerMessage(MessageTelePipeUpdate.class, MessageTelePipeUpdate.class, 1, Side.SERVER);
         INSTANCE.registerMessage(MessageTelePipeData.class, MessageTelePipeData.class, 3, Side.CLIENT);
-        INSTANCE.registerMessage(MessageChunkloadRequest.class, MessageChunkloadRequest.class, 4, Side.SERVER);
-        INSTANCE.registerMessage(MessageChunkloadData.class, MessageChunkloadData.class, 5, Side.CLIENT);
         INSTANCE.registerMessage(MessagePriorityPipe.class, MessagePriorityPipe.class, 6, Side.SERVER);
         INSTANCE.registerMessage(
             MessageJeweledPipeOptionsServer.class,

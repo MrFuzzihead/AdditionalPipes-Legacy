@@ -1,5 +1,4 @@
 #AdditionalPipes ver.4.7.6-jp by Ellen Kasacon
-tile.TeleportTether.name=テレポートテザー
 item.PipeItemsPriorityInsertion.name=分配挿入パイプ(アイテム)
 item.PipeItemsGravityFeed.name=重力パイプ(アイテム)
 item.PipeItemsDistributor.name=分配パイプ(アイテム)
@@ -13,12 +12,9 @@ item.PipeSwitchFluids.name=絶縁パイプ(液体)
 item.PipeSwitchItems.name=絶縁パイプ(アイテム)
 item.PipeLiquidsWaterPump.name=ポンプパイプ
 item.PipeItemsAddition.name=同種挿入パイプ(アイテム)
-item.PipeLiquidsObsidian.name=黒曜石パイプ(液体)
 item.PipeItemsJeweled.name=宝石パイプ(アイテム)
 
 #その他のアイテム/ブロック
-item.dogDeaggravator.name=オオカミ威嚇装置
-tile.teleportTether.name=テレポートテザー
 
 gui.pipeItemsDistributor=分配パイプ
 gui.pipeItemsPriorityInsertion=分配挿入パイプ
@@ -39,13 +35,11 @@ gui.acceptUnsorted=未指定を許可
 
 gate.pipeClosed=パイプが閉鎖(内部にアイテムを貯蔵)
 
-key.lasers=チャンクの境界を表示
 
 #ツールチップ
 tip.teleportPipe=長い配管ともおさらば！
 tip.teleportLogisticsPipe=Logistics Pipesと接続します。
 
-tooltip.dogDeaggravator=攻撃的なオオカミをおとなしくさせます
 
 itemGroup.buildcraft.apcreativetab=Additional Pipes
 

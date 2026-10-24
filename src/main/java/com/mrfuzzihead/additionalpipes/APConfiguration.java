@@ -9,16 +9,8 @@ import buildcraft.additionalpipes.utils.Log;
 
 public class APConfiguration {
 
-    public static int chunkSightRange; // config option
-
-    public static boolean chunkSightAutorefresh = true;
-
     public static boolean enableDebugLog;
 
-    public static boolean enableChunkloader;
-
-    // keybinding
-    public static int laserKeyCode; // config option (& in options menu)
     // misc
     public static boolean allowWRRemove;
 
@@ -50,14 +42,6 @@ public class APConfiguration {
                 powerTransmittanceCfg = 0.0f;
             }
 
-            Property chunkSightRangeProperty = config.get(Configuration.CATEGORY_GENERAL, "chunkSightRange", 8);
-            chunkSightRangeProperty.comment = "Range of chunk load boundaries.";
-            chunkSightRange = chunkSightRangeProperty.getInt();
-
-            Property laserKey = config.get(Configuration.CATEGORY_GENERAL, "laserKeyChar", 68);
-            laserKey.comment = "Default key to toggle chunk load boundaries.";
-            laserKeyCode = laserKey.getInt();
-
             Property filterRightclicksProperty = config.get(Configuration.CATEGORY_GENERAL, "filterRightclicks", false);
             filterRightclicksProperty.comment = "When right clicking on something with a gui, do not show the gui if you have a pipe in your hand";
             filterRightclicks = filterRightclicksProperty.getBoolean();
@@ -77,10 +61,6 @@ public class APConfiguration {
             Property gpPullRateProperty = config.get(Configuration.CATEGORY_GENERAL, "gravityFeedPipeTicksPerPull", 48);
             gpPullRateProperty.comment = "How many ticks the Gravity Feed Pipe needs to extract an item";
             gravityFeedPipeTicksPerPull = gpPullRateProperty.getInt();
-
-            Property enableChunkloaderProperty = config.get(Configuration.CATEGORY_GENERAL, "enableChunkloader", true);
-            enableChunkloaderProperty.comment = "Whether or not the chunkloader is added as a block";
-            enableChunkloader = enableChunkloaderProperty.getBoolean();
         } catch (Exception e) {
             Log.error("Error loading Additional Pipes configs." + e);
         } finally {

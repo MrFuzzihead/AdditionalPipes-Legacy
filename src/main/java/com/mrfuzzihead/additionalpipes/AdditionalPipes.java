@@ -5,26 +5,18 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import net.minecraft.block.Block;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.oredict.ShapedOreRecipe;
 
 import buildcraft.BuildCraftSilicon;
 import buildcraft.BuildCraftTransport;
 import buildcraft.additionalpipes.api.TeleportManagerBase;
-import buildcraft.additionalpipes.chunkloader.BlockChunkLoader;
-import buildcraft.additionalpipes.chunkloader.ChunkLoadingHandler;
-import buildcraft.additionalpipes.chunkloader.TileChunkLoader;
 import buildcraft.additionalpipes.gates.GateProvider;
 import buildcraft.additionalpipes.gates.TriggerPipeClosed;
 import buildcraft.additionalpipes.gui.GuiHandler;
-import buildcraft.additionalpipes.item.ItemDogDeaggravator;
 import buildcraft.additionalpipes.network.PacketHandler;
 import buildcraft.additionalpipes.pipes.APPipe;
 import buildcraft.additionalpipes.pipes.PipeItemsAddition;
@@ -34,7 +26,6 @@ import buildcraft.additionalpipes.pipes.PipeItemsGravityFeed;
 import buildcraft.additionalpipes.pipes.PipeItemsJeweled;
 import buildcraft.additionalpipes.pipes.PipeItemsPriorityInsertion;
 import buildcraft.additionalpipes.pipes.PipeItemsTeleport;
-import buildcraft.additionalpipes.pipes.PipeLiquidsObsidian;
 import buildcraft.additionalpipes.pipes.PipeLiquidsTeleport;
 import buildcraft.additionalpipes.pipes.PipeLiquidsWaterPump;
 import buildcraft.additionalpipes.pipes.PipeLogisticsTeleport;
@@ -57,7 +48,6 @@ import buildcraft.transport.PipeTransportPower;
 import buildcraft.transport.pipes.PipeFluidsGold;
 import buildcraft.transport.pipes.PipePowerGold;
 import buildcraft.transport.pipes.PipePowerIron;
-import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -96,9 +86,6 @@ public class AdditionalPipes {
 
     public boolean logisticsPipesInstalled;
 
-    // chunk load boundaries
-    public ChunkLoadViewDataProxy chunkLoadViewer;
-
     public BCCreativeTab creativeTab;
 
     // teleport scanner TODO
@@ -135,13 +122,6 @@ public class AdditionalPipes {
     public Item pipeLiquidsSwitch;
     // water pump pipe
     public Item pipeLiquidsWaterPump;
-    // obsidian fluid pipe
-    public Item pipeLiquidsObsidian;
-    // chunk loader
-    public Block blockChunkLoader;
-
-    // dog deaggravator
-    public Item dogDeaggravator;
 
     public ITriggerInternal triggerPipeClosed;
 
@@ -165,38 +145,6 @@ public class AdditionalPipes {
         // EntityList.addMapping(EntityBetterCat.class, "betterCat", 79, 0xEDCE21, 0x564434);
 
         NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandler());
-
-        if (APConfiguration.enableChunkloader) {
-            Log.info("Registering chunk load handler");
-            ForgeChunkManager.setForcedChunkLoadingCallback(this, new ChunkLoadingHandler());
-            chunkLoadViewer = new ChunkLoadViewDataProxy(APConfiguration.chunkSightRange);
-            FMLCommonHandler.instance()
-                .bus()
-                .register(chunkLoadViewer);
-
-            // register Teleport Tether block
-            blockChunkLoader = new BlockChunkLoader();
-            blockChunkLoader.setBlockName("teleportTether");
-            GameRegistry.registerBlock(blockChunkLoader, ItemBlock.class, "chunkLoader");
-            GameRegistry.registerTileEntity(TileChunkLoader.class, "TeleportTether");
-            GameRegistry.addRecipe(
-                new ShapedOreRecipe(
-                    blockChunkLoader,
-                    "iii",
-                    "iLi",
-                    "ici",
-                    'i',
-                    "ingotIron",
-                    'L',
-                    "gemLapis",
-                    'c',
-                    BuildCraftSilicon.redstoneChipset));
-
-            // the lasers key function depends on the chunk loading code, so it can only be enabled if the chunk loader
-            // is
-            proxy.registerKeyHandler();
-
-        }
 
         proxy.registerRendering();
 
@@ -273,21 +221,6 @@ public class AdditionalPipes {
                 new Object[] { BuildCraftTransport.pipePowerQuartz });
 
         }
-
-        dogDeaggravator = new ItemDogDeaggravator();
-        GameRegistry.registerItem(dogDeaggravator, ItemDogDeaggravator.NAME);
-        GameRegistry.addRecipe(
-            new ShapedOreRecipe(
-                dogDeaggravator,
-                "gsg",
-                "gig",
-                "g g",
-                'i',
-                "ingotIron",
-                'g',
-                "ingotGold",
-                's',
-                "stickWood"));
 
         Log.info("Running Teleport Manager Tests");
         TeleportManagerTest.runAllTests();
@@ -498,16 +431,6 @@ public class AdditionalPipes {
             BuildCraftTransport.pipeWaterproof,
             'W',
             BuildCraftTransport.pipeFluidsWood);
-
-        // obsidian fluid pipe
-        // set fluid capacity
-        PipeTransportFluids.fluidCapacities.put(PipeLiquidsObsidian.class, 100);
-        pipeLiquidsObsidian = PipeCreator.createPipeAndRecipe(
-            1,
-            PipeLiquidsObsidian.class,
-            true,
-            BuildCraftTransport.pipeItemsObsidian,
-            BuildCraftTransport.pipeWaterproof);
     }
 
     // legacy method

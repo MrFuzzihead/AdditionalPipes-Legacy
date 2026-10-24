@@ -1,4 +1,3 @@
-tile.TeleportTether.name=Телепорт тизер
 item.PipeItemsPriorityInsertion.name=Приоритетная вводящая труба
 item.PipeItemsDistributor.name=Распределяющая транспортная труба
 item.PipeItemsClosed.name=Закрытая транспортная труба
@@ -21,7 +20,6 @@ gate.phasedSignalBlue=Синий переключаемый сигнал
 gate.phasedSignalGreen=Зелёный переключаемый сигнал
 gate.phasedSignalYellow=Жёлтый переключаемый сигнал
 
-key.lasers=Переключает отображение загрузки границ чанков
 
 tip.teleportPipe=Больше никаких труб!
 

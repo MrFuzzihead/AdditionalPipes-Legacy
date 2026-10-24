@@ -1,36 +1,18 @@
 package buildcraft.additionalpipes;
 
-import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.item.Item;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import buildcraft.additionalpipes.keyboard.KeyInputEventHandler;
-import buildcraft.additionalpipes.keyboard.Keybindings;
 import buildcraft.additionalpipes.utils.Log;
 import buildcraft.transport.ItemPipe;
 import buildcraft.transport.Pipe;
 import buildcraft.transport.TransportProxyClient;
-import cpw.mods.fml.client.registry.ClientRegistry;
-import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class MultiPlayerProxyClient extends MultiPlayerProxy {
-
-    @Override
-    public void registerKeyHandler() {
-
-        Log.info("Registering key handler(s)");
-
-        Keybindings.lasers = new KeyBinding("key.lasers", APConfiguration.laserKeyCode, AdditionalPipes.NAME);
-        ClientRegistry.registerKeyBinding(Keybindings.lasers);
-
-        FMLCommonHandler.instance()
-            .bus()
-            .register(new KeyInputEventHandler());
-    }
 
     @Override
     public void registerPipeRendering(Item res) {

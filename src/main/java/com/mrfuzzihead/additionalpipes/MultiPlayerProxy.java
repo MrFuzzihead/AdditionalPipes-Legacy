@@ -7,8 +7,6 @@ import buildcraft.transport.Pipe;
 
 public class MultiPlayerProxy {
 
-    public void registerKeyHandler() {}
-
     public void registerRendering() {}
 
     public void registerPipeRendering(Item res) {}

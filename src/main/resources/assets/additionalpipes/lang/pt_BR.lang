@@ -1,4 +1,3 @@
-tile.TeleportTether.name=Teletransporte Tether
 item.PipeLiquidsRedstone.name=Tube de Redstone Fluida
 item.PipeItemsRedstone.name=Tubo de Transporte de Redstone
 item.PipeItemsDistributor.name=Tubo de Distribuição de Transporte
@@ -11,6 +10,5 @@ item.PipeSwitchFluids.name=Tube de Troca de Fluido
 item.PipeSwitchItems.name=Tubo de Troca de Transporte
 item.PipeLiquidsWaterPump.name=Tubo da Bomba d'água
 
-key.lasers=Alterna a exibição dos 'chunks' carregados
 
 tip.teleportPipe=Transporta seu material sem a necessidade para uma longa tubulação

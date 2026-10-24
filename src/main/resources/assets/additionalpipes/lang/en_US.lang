@@ -1,4 +1,3 @@
-tile.TeleportTether.name=Teleport Tether
 item.PipeItemsPriorityInsertion.name=Priority Insertion Pipe
 item.PipeItemsGravityFeed.name=Gravity Feed Transport Pipe
 item.PipeItemsDistributor.name=Distribution Transport Pipe
@@ -12,12 +11,9 @@ item.PipeSwitchFluids.name=Switch Fluid Pipe
 item.PipeSwitchItems.name=Switch Transport Pipe
 item.PipeLiquidsWaterPump.name=Water Pump Pipe
 item.PipeItemsAddition.name=Addition Transport Pipe
-item.PipeLiquidsObsidian.name=Obsidian Fluid Pipe
 item.PipeItemsJeweled.name=Jeweled Transport Pipe
 
 #regular items & blocks
-item.dogDeaggravator.name=Dog Deaggravator
-tile.teleportTether.name=Teleport Tether
 
 gui.pipeItemsDistributor=Distribution Pipe
 gui.pipeItemsPriorityInsertion=Priority Insertion Pipe
@@ -38,13 +34,11 @@ gui.acceptUnsorted=Accept Unsorted
 
 gate.pipeClosed=Pipe Closed (Storing Items)
 
-key.lasers=Show chunk load boundaries
 
 #tooltips for teleport pipes
 tip.teleportPipe=No more long pipelines!
 tip.teleportLogisticsPipe=Connects to Logistics Pipes!
 
-tooltip.dogDeaggravator=Calms down your dogs
 
 itemGroup.buildcraft.apcreativetab=Additional Pipes
 
