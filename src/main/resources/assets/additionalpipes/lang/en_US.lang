@@ -1,4 +1,3 @@
-item.PipeItemsPriorityInsertion.name=Priority Insertion Pipe
 item.PipeItemsGravityFeed.name=Gravity Feed Transport Pipe
 item.PipeItemsDistributor.name=Distribution Transport Pipe
 item.PipeItemsClosed.name=Closed Transport Pipe
@@ -16,7 +15,6 @@ item.PipeItemsJeweled.name=Jeweled Transport Pipe
 #regular items & blocks
 
 gui.pipeItemsDistributor=Distribution Pipe
-gui.pipeItemsPriorityInsertion=Priority Insertion Pipe
 gui.jeweled_pipe=Jeweled Pipe
 
 #tab names for the Jeweled Pipe GUI

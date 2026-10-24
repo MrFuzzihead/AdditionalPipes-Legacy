@@ -30,9 +30,6 @@ public class Textures {
     public static final ResourceLocation GUI_DISTRIBUTION = new ResourceLocation(
         "additionalpipes",
         TEXTURE_PATH + "/gui/distributionGui.png");
-    public static final ResourceLocation GUI_PRIORITY = new ResourceLocation(
-        "additionalpipes",
-        TEXTURE_PATH + "/gui/priorityGui.png");
     public static final ResourceLocation GUI_JEWELED = new ResourceLocation(
         "additionalpipes",
         TEXTURE_PATH + "/gui/guiPipeJeweled.png");

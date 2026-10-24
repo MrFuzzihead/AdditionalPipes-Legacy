@@ -24,7 +24,6 @@ import buildcraft.additionalpipes.pipes.PipeItemsClosed;
 import buildcraft.additionalpipes.pipes.PipeItemsDistributor;
 import buildcraft.additionalpipes.pipes.PipeItemsGravityFeed;
 import buildcraft.additionalpipes.pipes.PipeItemsJeweled;
-import buildcraft.additionalpipes.pipes.PipeItemsPriorityInsertion;
 import buildcraft.additionalpipes.pipes.PipeItemsTeleport;
 import buildcraft.additionalpipes.pipes.PipeLiquidsTeleport;
 import buildcraft.additionalpipes.pipes.PipeLiquidsWaterPump;
@@ -104,8 +103,6 @@ public class AdditionalPipes {
     // Jeweled
     public Item pipeItemsJeweled;
 
-    // priority insertion pipe
-    public Item pipeItemsPriority;
     // Item Teleport
     public Item pipeItemsTeleport;
     // Liquid Teleport
@@ -357,13 +354,6 @@ public class AdditionalPipes {
             BuildCraftTransport.pipeItemsClay,
             'R',
             "dustRedstone");
-
-        pipeItemsPriority = PipeCreator.createPipeAndRecipe(
-            2,
-            PipeItemsPriorityInsertion.class,
-            true,
-            pipeItemsDistributor,
-            BuildCraftTransport.pipeItemsClay);
 
         // Gravity Feed Pipe
         pipeItemsGravityFeed = PipeCreator.createPipeAndRecipe(
