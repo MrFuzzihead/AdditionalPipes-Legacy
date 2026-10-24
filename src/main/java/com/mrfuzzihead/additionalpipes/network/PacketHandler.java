@@ -2,8 +2,6 @@ package buildcraft.additionalpipes.network;
 
 import buildcraft.additionalpipes.AdditionalPipes;
 import buildcraft.additionalpipes.network.message.MessageDistPipe;
-import buildcraft.additionalpipes.network.message.MessageJeweledPipeOptionsClient;
-import buildcraft.additionalpipes.network.message.MessageJeweledPipeOptionsServer;
 import buildcraft.additionalpipes.network.message.MessageTelePipeData;
 import buildcraft.additionalpipes.network.message.MessageTelePipeUpdate;
 import cpw.mods.fml.common.network.NetworkRegistry;
@@ -19,16 +17,6 @@ public class PacketHandler {
         INSTANCE.registerMessage(MessageDistPipe.class, MessageDistPipe.class, 0, Side.SERVER);
         INSTANCE.registerMessage(MessageTelePipeUpdate.class, MessageTelePipeUpdate.class, 1, Side.SERVER);
         INSTANCE.registerMessage(MessageTelePipeData.class, MessageTelePipeData.class, 3, Side.CLIENT);
-        INSTANCE.registerMessage(
-            MessageJeweledPipeOptionsServer.class,
-            MessageJeweledPipeOptionsServer.class,
-            7,
-            Side.SERVER);
-        INSTANCE.registerMessage(
-            MessageJeweledPipeOptionsClient.class,
-            MessageJeweledPipeOptionsClient.class,
-            8,
-            Side.CLIENT);
 
     }
 }

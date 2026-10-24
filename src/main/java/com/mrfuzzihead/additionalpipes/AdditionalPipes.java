@@ -23,7 +23,6 @@ import buildcraft.additionalpipes.pipes.PipeItemsAddition;
 import buildcraft.additionalpipes.pipes.PipeItemsClosed;
 import buildcraft.additionalpipes.pipes.PipeItemsDistributor;
 import buildcraft.additionalpipes.pipes.PipeItemsGravityFeed;
-import buildcraft.additionalpipes.pipes.PipeItemsJeweled;
 import buildcraft.additionalpipes.pipes.PipeItemsTeleport;
 import buildcraft.additionalpipes.pipes.PipeLiquidsTeleport;
 import buildcraft.additionalpipes.pipes.PipeLiquidsWaterPump;
@@ -100,8 +99,6 @@ public class AdditionalPipes {
     public Item pipeItemsGravityFeed;
     // Distributor
     public Item pipeItemsDistributor;
-    // Jeweled
-    public Item pipeItemsJeweled;
 
     // Item Teleport
     public Item pipeItemsTeleport;
@@ -314,19 +311,6 @@ public class AdditionalPipes {
                     new Object[] { pipeItemsTeleport, BuildCraftSilicon.redstoneChipset });
             }
         }
-
-        // Jeweled Pipe
-        pipeItemsJeweled = PipeCreator.createPipeAndRecipe(
-            2,
-            PipeItemsJeweled.class,
-            false,
-            " D ",
-            "DGD",
-            " D ",
-            'D',
-            BuildCraftTransport.pipeItemsDiamond,
-            'G',
-            "gearGold");
 
         // Distributor Pipe
         pipeItemsDistributor = PipeCreator.createPipeAndRecipe(

@@ -38,7 +38,7 @@ otherPipe.transport.injectItem(event.item, newOrientation); // B's Entered fires
 ### 3. Closed Pipe buffer is lost when the pipe is broken
 `PipeItemsClosed.dropContents()` doesn't drop `inventory[0..9]`; only the GUI recovers them. Breaking the pipe loses the whole buffer.
 
-**Fix:** override `getDroppedItems()` / `dropContents()` to return/drop the inventory contents (see `PipeItemsJeweled.dropContents` for the pattern).
+**Fix:** override `getDroppedItems()` / `dropContents()` to return/drop the inventory contents.
 
 ### 4. Distribution Pipe can send items into an unconnected side
 `pipes/PipeItemsDistributor.java:38-73`
@@ -54,10 +54,9 @@ The handler clears `event.destinations` and adds `VALID_DIRECTIONS[distSide]` un
 ### 5. Packet handlers are unvalidated (and mostly unauthenticated)
 `network/message/*.java`
 
-- `MessageDistPipe` / `MessageJeweledPipeOptionsServer` / `MessageTelePipeUpdate` check `te instanceof TileGenericPipe` but cast the inner pipe without an `instanceof` check → `ClassCastException` for any other pipe type.
-- `MessageJeweledPipeOptionsServer` does `pipe.filterData[message.index - 1]` with no bounds check (`index` is an attacker-controlled byte).
+- `MessageDistPipe` / `MessageTelePipeUpdate` check `te instanceof TileGenericPipe` but cast the inner pipe without an `instanceof` check → `ClassCastException` for any other pipe type.
 - `MessageTelePipeData` casts `(TileGenericPipe) te` with no check at all.
-- No handler verifies the player is near the pipe or owns it (except the partial owner check in `MessageTelePipeUpdate`). Any client can reconfigure any distributor/jeweled pipe anywhere on a server.
+- No handler verifies the player is near the pipe or owns it (except the partial owner check in `MessageTelePipeUpdate`). Any client can reconfigure any distributor pipe anywhere on a server.
 - `MessageTelePipeData` allocates arrays from an unbounded network length.
 
 Exceptions inside these handlers are logged/dropped by FML rather than crashing the server, but they are easy log-spam/desync vectors. A shared `PositionMessage` base with `getPipe(Class<T>)` + `isPlayerNearBlock` (as in `7678cfc`) is the right refactor.
@@ -107,8 +106,6 @@ Add a focused in-game test matrix (idle/full/partially full/removed receiver, tr
 - `GuiDistributionPipe`: `int guiX = ...` in `initGui` shadows the `public int guiX` field, so the title is drawn at `(42,22)` screen-relative instead of over the GUI. Also the middle "value" buttons are clickable and increment the value, and the GUI loses rapid clicks because it sends absolute values computed from stale client state.
 - `PipeItemsClosed`'s 10th slot is effectively a hidden staging slot; either expose all 10 or simplify to 9 and adjust the rotation.
 - `EntityBetterCat`: dead/unregistered; `ticksExisted % 40 * 12 == 0` is `(ticksExisted % 40) * 12 == 0` (every 40 ticks, not every 480) and it has a `System.out.println`. Delete it.
-- `PipeItemsJeweled` `SideFilterData.markDirty()` is a no-op and the container never marks the pipe dirty; periodic saves can miss filter changes until an unload/save. Call `pipe.container.markDirty()`.
-- `PipeItemsJeweled` / `Textures` reference `GuiJeweledPipe.NUM_TABS` (a `@SideOnly(CLIENT)` class) from common code. It works only because `NUM_TABS` is a compile-time constant; move the tab count to a common constant before it stops being constant.
 - `TeleportManager` log strings are built even when debug is off. Add `Log` overloads that take a `Throwable`; stop using `printStackTrace`.
 - `CommandAdditionalPipes`: `args[1]` AIOOBE, wrong list for `"power"`, no `"logistics"`, no aliases/dimension in output (partially fixed on your branch).
 - Recipe dead keys: `PipeItemsGravityFeed` declares `'S', "stone"` but the pattern has no `S`; `PipeLiquidsWaterPump` declares lowercase `'w', waterproof` but the pattern has no `w`. The `allowWRRemove` block re-adds BC's uncraft recipes that BC 7.1.63 already adds itself (comment acknowledges it) — remove the BC-pipe half.
@@ -126,9 +123,7 @@ Add a focused in-game test matrix (idle/full/partially full/removed receiver, tr
 - `README.md` still documents MC 1.5/BC3, `setupDecompWorkspace`, and Eclipse; rewrite for the GTNH/RFG toolchain (`./gradlew build`, `runClient`, Java 25, `./gradlew spotlessCheck`).
 - Remove dead code: `TeleportManager.getWorldSave/frequencyNames/*` (no UI), `APConfiguration.enableTriggers` (never read), `MessageTelePipeUpdate._newData`, commented legacy code in the GUIs, `GuiTeleportPipe`'s `StringBuilder` chains.
 - `APConfiguration` doesn't clamp `waterPumpWaterPerTick` or `gravityFeedPipeTicksPerPull`; zero/negative values produce no-op or every-tick behavior. Clamp them when loading.
-- Localization: `GuiTeleportPipe`, `GuiPipeClosed` (uses non-namespaced `"Closed Pipe"`), and `GuiJeweledPipe`'s English strings are hardcoded; other lang files are 20–40 % complete. Move strings to lang keys.
-- `NetworkUtils` uses `(len/8)+1` bytes (one wasted when `len % 8 == 0`); `PipeItemsJeweled` syncs three boolean arrays when one bitmask byte would do.
-- `GuiJeweledPipe` adds **all 162 filter slots** to the container (only 27 visible); `Container.detectAndSendChanges` loops all 198 slots every tick. A single active-tab container (27 slots) with a small "switch tab" packet would be materially cheaper.
+- Localization: `GuiTeleportPipe` and `GuiPipeClosed` (uses non-namespaced `"Closed Pipe"`) have hardcoded English strings; other lang files are 20–40 % complete. Move strings to lang keys.
 - `PipeItemsAddition` runs a simulated `Transactor.add` for every neighbor on every item arrival; cache per side/item for a tick if profiling shows it.
 
 ---
@@ -145,13 +140,12 @@ Add a focused in-game test matrix (idle/full/partially full/removed receiver, tr
 
 ## ✨ Features I'd recommend
 
-- **WAILA/HWYLA + BC debugger** for teleport pipes: frequency, owner, send/receive state, network size, partner coordinates. Currently the debugger only shows jeweled filter flags.
+- **WAILA/HWYLA + BC debugger** for teleport pipes: frequency, owner, send/receive state, network size, partner coordinates.
 - **Frequency naming UI** (the manager already has `frequencyNames`, but nothing sets or shows them) plus `/additionalpipes teleport all|logistics` with tab completion and dimension in the output.
 - **Teleport pipe wrench actions**: copy frequency/owner between pipes, toggle send/receive, and a visual per-frequency tint/particle.
 - **Teleport scanner** (already a TODO at `AdditionalPipes.java:91`): a handheld item that highlights pipes on a frequency, useful for large bases.
 - **Gate triggers/actions for teleport pipes** (`GateProvider` has an empty `if (pipe instanceof PipeTeleport)`): "frequency has N pipes", "item/fluid/power teleported", "owner online"; actions to change frequency/toggle state.
 - **Config GUI** (`IModGuiFactory`) + client/server config split; clamp all numeric values; expose `enableTriggers` or delete it.
-- **Ghost slots + NBT/ore-dict matching + "copy filters to all sides"** for jeweled filters; empty filter = allow all; shift-click support in all pipe containers.
 - **Per-pipe water pump rate** and a **closed-pipe overflow policy** (void oldest / stop accepting / drop) instead of silent double loss.
 - **Recipe config** to disable individual pipes (use BC's `BCRegistry` instead of `BlockGenericPipe.registerPipe` directly) and NEI hiding for the deprecated insertion pipe.
 - **JUnit test suite** (manager, filters, NBT round-trips, config clamping, packet validation) instead of runtime tests; add a manual test matrix for teleport loops, chunk unload/reload, LP on/off, and power accounting.
@@ -198,7 +192,6 @@ BC 7.1.63 already ships: **Wood/Iron** (extraction), **Clay** (insertion), **Dia
 
 | AP item | Closest BC 7.1.63 equivalent | Redundancy | What AP still uniquely adds | Recommendation |
 |---|---|---:|---|---|
-| `PipeItemsJeweled` | `PipeItemsDiamond` (54 total filter slots, 9 per side, round-robin, damage matching) | **~55 %** | NBT-match toggle (BC's `StackHelper.isMatchingItemOrList` passes `matchNBT=false`), ignore-metadata toggle, 27 slots per side, per-side "accept unsorted" | **Tweak/keep** — NBT filtering is genuinely useful in GTNH; trim the 162-slot GUI |
 | `PipeItemsDistributor` | `PipeItemsDiamond` (random/even split; weighted only by duplicating filter entries for one item type) | **~40 %** | General weighted counts per side, independent of item type | **Keep/tweak** (fix the unconnected-side bug) |
 | `PipeItemsAddition` | none | **~5 %** | Insert only into inventories that already contain the item | **Keep** |
 | `PipeItemsClosed` | `PipeItemsVoid` | **~50 %** | 10-slot buffer + "pipe closed" gate trigger | **Tweak/keep**; rebrand as "Buffered Void Pipe" |
@@ -208,11 +201,9 @@ BC 7.1.63 already ships: **Wood/Iron** (extraction), **Clay** (insertion), **Dia
 | `PipeItemsTeleport` / `PipeLiquidsTeleport` / `PipePowerTeleport` / `PipeLogisticsTeleport` | none | **0 %** | Teleportation | **Keep** |
 
 
-**Bottom line:** with `Advanced Wood`, `Advanced Insertion` and `PipeLiquidsObsidian` removed, **no remaining pipe is fully redundant**. `Jeweled` (~55 %) and `Closed` (~50 %) have substantial overlap but keep distinct features, the switch pipes are ~85 % functionally covered by gates but remain a cheap gate-free alternative, and the rest (teleports, addition, distributor, gravity feed, water pump) are unique or nearly so.
+**Bottom line:** with `Advanced Wood`, `Advanced Insertion`, `PipeLiquidsObsidian` and `PipeItemsJeweled` removed, **no remaining pipe is fully redundant**. `Closed` (~50 %) has substantial overlap but keeps the buffer + gate trigger, the switch pipes are ~85 % functionally covered by gates but remain a cheap gate-free alternative, and the rest (teleports, addition, distributor, gravity feed, water pump) are unique or nearly so.
 
 ### Detailed notes
-
-**`PipeItemsJeweled` — keep the NBT toggle, trim the GUI.** BC's Diamond pipe's filters are 54 slots (9 per side) and its `StackHelper.isMatchingItemOrList` ultimately calls `isMatchingItem(a, b, true, false)` — i.e. it **matches damage but ignores NBT**. AP's Jeweled pipe's `matchNBT` and `matchMetadata` toggles are therefore genuinely additive for modded packs full of NBT-variant items, and 27 slots per side is more room. That said, the current implementation puts **162 slots** in the container and loops them all every tick; a 27-slot active-tab container plus a "switch tab" packet would retain the feature at a fraction of the cost. Also consider adding ore-dictionary matching (BC has it, AP does not) and ghost slots so filters do not consume items.
 
 **`PipeItemsDistributor` — weighted distribution is unique.** BC's Diamond pipe can distribute evenly/randomly, and can approximate weights by putting the same item in multiple filter slots on one side, but only for items that match those filters. AP's `distData` gives general per-side weights for any item. Keep it, fix the disconnected-side item drop, and consider adding a round-robin mode so it can also serve as a cheap Diamond-pipe alternative.
 
@@ -226,7 +217,7 @@ BC 7.1.63 already ships: **Wood/Iron** (extraction), **Clay** (insertion), **Dia
 
 ### Removal note (applied in these changes)
 
-`PipeItemsAdvancedWood` (with `PipeTransportAdvancedWood`, its GUI/container and `MessageAdvWoodPipe`), `PipeItemsAdvancedInsertion`, `PipeItemsPriorityInsertion` (with its GUI/container and message), `PipeLiquidsObsidian`, `ItemDogDeaggravator`, and the TeleportTether chunk-loading subsystem (block, tile, loading handler, chunk-boundary viewer, keybind, messages and config) were removed outright, including their recipes, lang keys, textures and sounds. BC stores pipes as a **numeric item ID** in tile NBT; blocks/items are likewise persisted by ID:
+`PipeItemsAdvancedWood` (with `PipeTransportAdvancedWood`, its GUI/container and `MessageAdvWoodPipe`), `PipeItemsAdvancedInsertion`, `PipeItemsPriorityInsertion` (with its GUI/container and message), `PipeItemsJeweled` (with its GUI/container, messages and `SideFilterData` helper), `PipeLiquidsObsidian`, `ItemDogDeaggravator`, and the TeleportTether chunk-loading subsystem (block, tile, loading handler, chunk-boundary viewer, keybind, messages and config) were removed outright, including their recipes, lang keys, textures and sounds. BC stores pipes as a **numeric item ID** in tile NBT; blocks/items are likewise persisted by ID:
 
 ```java
 // TileGenericPipe.writeToNBT
@@ -241,8 +232,8 @@ Any existing pipe of these types in an older world will therefore fail `createPi
 
 | Action | Item/feature |
 |---|---|
-| **Removed in these changes** | `PipeItemsAdvancedWood`, `PipeItemsAdvancedInsertion`, `PipeItemsPriorityInsertion`, `PipeLiquidsObsidian`, `ItemDogDeaggravator`, TeleportTether/chunk-loading subsystem |
-| **Tweak then keep** | `PipeItemsJeweled` (NBT/meta toggles, trim GUI, ghost slots), `PipeItemsDistributor` (fix disconnected-side drop), `PipeItemsClosed` (rename Buffered Void, fix overflow/loss) |
+| **Removed in these changes** | `PipeItemsAdvancedWood`, `PipeItemsAdvancedInsertion`, `PipeItemsPriorityInsertion`, `PipeItemsJeweled`, `PipeLiquidsObsidian`, `ItemDogDeaggravator`, TeleportTether/chunk-loading subsystem |
+| **Tweak then keep** | `PipeItemsDistributor` (fix disconnected-side drop), `PipeItemsClosed` (rename Buffered Void, fix overflow/loss) |
 | **Leave alone** | `PipeItemsAddition`, `PipeItemsGravityFeed`, `PipeLiquidsWaterPump`, switch pipes, all teleport pipes |
 
 ## Suggested fix order
@@ -257,4 +248,4 @@ Any existing pipe of these types in an older world will therefore fail `createPi
 8. Everything in 🔵 and the refactors.
 9. The immediate one-liner: `isRemote` in the water pump.
 
-**Separate workstream:** the redundant/removed items are gone; the remaining redundancy decisions are to tweak `Jeweled`/`Distributor`/`Closed` and leave the rest alone.
+**Separate workstream:** the redundant/removed items are gone; the remaining redundancy decisions are to tweak `Distributor`/`Closed` and leave the rest alone.

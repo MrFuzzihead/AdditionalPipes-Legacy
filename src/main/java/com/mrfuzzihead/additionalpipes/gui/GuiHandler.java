@@ -4,7 +4,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 
-import buildcraft.additionalpipes.pipes.PipeItemsJeweled;
 import buildcraft.additionalpipes.pipes.PipeTeleport;
 import buildcraft.additionalpipes.utils.Log;
 import buildcraft.transport.TileGenericPipe;
@@ -16,7 +15,6 @@ public class GuiHandler implements IGuiHandler {
     public static final int PIPE_TP = 1;
     public static final int PIPE_DIST = 2;
     public static final int PIPE_CLOSED = 4;
-    public static final int PIPE_JEWELED = 6;
 
     @Override
     public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
@@ -34,8 +32,6 @@ public class GuiHandler implements IGuiHandler {
                 return new ContainerDistributionPipe((TileGenericPipe) tile);
             case PIPE_CLOSED:
                 return new ContainerPipeClosed(player.inventory, ((TileGenericPipe) tile).pipe);
-            case PIPE_JEWELED:
-                return new ContainerJeweledPipe(player.inventory, ((PipeItemsJeweled) ((TileGenericPipe) tile).pipe));
             default:
                 return null;
         }
@@ -57,8 +53,6 @@ public class GuiHandler implements IGuiHandler {
                 return new GuiDistributionPipe((TileGenericPipe) tile);
             case PIPE_CLOSED:
                 return new GuiPipeClosed(player.inventory, ((TileGenericPipe) tile).pipe);
-            case PIPE_JEWELED:
-                return new GuiJeweledPipe(player.inventory, ((PipeItemsJeweled) ((TileGenericPipe) tile).pipe));
             default:
                 return null;
         }

@@ -10,7 +10,6 @@ item.PipeLiquidsWaterPump.name=Водяная помповая труба
 item.PipeItemsAddition.name=Дополнительная транспортная труба
 
 gui.pipeItemsDistributor=Распределяющая труба
-gui.jeweled_pipe=Драгоценная труба
 
 gate.pipeClosed=Труба закрыта (Накапливает предметы)
 gate.phasedSignalRed=Красный переключаемый сигнал

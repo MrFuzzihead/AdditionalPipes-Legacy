@@ -10,25 +10,12 @@ item.PipeSwitchFluids.name=Switch Fluid Pipe
 item.PipeSwitchItems.name=Switch Transport Pipe
 item.PipeLiquidsWaterPump.name=Water Pump Pipe
 item.PipeItemsAddition.name=Addition Transport Pipe
-item.PipeItemsJeweled.name=Jeweled Transport Pipe
 
 #regular items & blocks
 
 gui.pipeItemsDistributor=Distribution Pipe
-gui.jeweled_pipe=Jeweled Pipe
 
-#tab names for the Jeweled Pipe GUI
-gui.tab.up=Up
-gui.tab.down=Down
-gui.tab.north=North
-gui.tab.south=South
-gui.tab.east=East
-gui.tab.west=West
 
-gui.match=Match:
-gui.NBT=Tag
-gui.metadata=Meta
-gui.acceptUnsorted=Accept Unsorted
 
 gate.pipeClosed=Pipe Closed (Storing Items)
 

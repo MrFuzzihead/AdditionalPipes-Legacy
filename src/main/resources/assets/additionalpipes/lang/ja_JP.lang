@@ -11,25 +11,13 @@ item.PipeSwitchFluids.name=絶縁パイプ(液体)
 item.PipeSwitchItems.name=絶縁パイプ(アイテム)
 item.PipeLiquidsWaterPump.name=ポンプパイプ
 item.PipeItemsAddition.name=同種挿入パイプ(アイテム)
-item.PipeItemsJeweled.name=宝石パイプ(アイテム)
 
 #その他のアイテム/ブロック
 
 gui.pipeItemsDistributor=分配パイプ
-gui.jeweled_pipe=宝石パイプ
 
 #宝石パイプGUIのタブ名
-gui.tab.up=上
-gui.tab.down=下
-gui.tab.north=北
-gui.tab.south=南
-gui.tab.east=東
-gui.tab.west=西
 
-gui.match=一致:
-gui.NBT=タグ
-gui.metadata=メタ
-gui.acceptUnsorted=未指定を許可
 
 gate.pipeClosed=パイプが閉鎖(内部にアイテムを貯蔵)
 
