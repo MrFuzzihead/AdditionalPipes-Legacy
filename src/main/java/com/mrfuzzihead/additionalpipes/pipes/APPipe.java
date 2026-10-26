@@ -1,9 +1,10 @@
-package buildcraft.additionalpipes.pipes;
+package com.mrfuzzihead.additionalpipes.pipes;
 
 import net.minecraft.item.Item;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import buildcraft.additionalpipes.textures.Textures;
+import com.mrfuzzihead.additionalpipes.textures.Textures;
+
 import buildcraft.api.core.IIconProvider;
 import buildcraft.transport.Pipe;
 import buildcraft.transport.PipeTransport;

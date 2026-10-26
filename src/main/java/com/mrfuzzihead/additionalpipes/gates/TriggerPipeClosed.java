@@ -1,9 +1,10 @@
-package buildcraft.additionalpipes.gates;
+package com.mrfuzzihead.additionalpipes.gates;
 
 import net.minecraft.util.StatCollector;
 
-import buildcraft.additionalpipes.pipes.PipeItemsClosed;
-import buildcraft.additionalpipes.utils.Log;
+import com.mrfuzzihead.additionalpipes.pipes.PipeItemsClosed;
+import com.mrfuzzihead.additionalpipes.utils.Log;
+
 import buildcraft.api.statements.IStatement;
 import buildcraft.api.statements.IStatementContainer;
 import buildcraft.api.statements.IStatementParameter;
@@ -28,8 +29,7 @@ public class TriggerPipeClosed extends APTrigger implements ITriggerInternal {
         try {
             closedPipe = (PipeItemsClosed) ((TileGenericPipe) statement.getTile()).pipe;
         } catch (RuntimeException ex) {
-            Log.error("Failed to get reference to Closed Pipe:");
-            ex.printStackTrace();
+            Log.error("Failed to get reference to Closed Pipe", ex);
             return false;
         }
 

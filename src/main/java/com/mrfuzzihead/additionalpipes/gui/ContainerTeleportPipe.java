@@ -1,4 +1,4 @@
-package buildcraft.additionalpipes.gui;
+package com.mrfuzzihead.additionalpipes.gui;
 
 import java.util.List;
 
@@ -6,11 +6,12 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.ICrafting;
 
-import buildcraft.additionalpipes.network.PacketHandler;
-import buildcraft.additionalpipes.network.message.MessageTelePipeData;
-import buildcraft.additionalpipes.pipes.PipeTeleport;
-import buildcraft.additionalpipes.pipes.TeleportManager;
-import buildcraft.additionalpipes.utils.Log;
+import com.mrfuzzihead.additionalpipes.network.PacketHandler;
+import com.mrfuzzihead.additionalpipes.network.message.MessageTelePipeData;
+import com.mrfuzzihead.additionalpipes.pipes.PipeTeleport;
+import com.mrfuzzihead.additionalpipes.pipes.TeleportManager;
+import com.mrfuzzihead.additionalpipes.utils.Log;
+
 import buildcraft.core.lib.gui.BuildCraftContainer;
 import buildcraft.transport.TileGenericPipe;
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -30,9 +31,6 @@ public class ContainerTeleportPipe extends BuildCraftContainer {
     // and output locations should be shown on the ledger
     private boolean isSendingPipe;
 
-    // only set on the server side
-    private int originalfreq;
-
     public ContainerTeleportPipe(EntityPlayer player, PipeTeleport<?> pipe) {
         super(0);
         this.pipe = pipe;
@@ -46,7 +44,11 @@ public class ContainerTeleportPipe extends BuildCraftContainer {
 
         if (FMLCommonHandler.instance()
             .getEffectiveSide() == Side.SERVER) {
-            List<PipeTeleport<?>> connectedPipes = TeleportManager.instance
+            TeleportManager manager = TeleportManager.getOrNull();
+            if (manager == null) {
+                return;
+            }
+            List<PipeTeleport<?>> connectedPipes = manager
                 .<PipeTeleport<?>>getConnectedPipes(pipe, !isSendingPipe, isSendingPipe);
             int[] locations = new int[connectedPipes.size() * 3];
             for (int i = 0; i < connectedPipes.size() && i < 9; i++) {
@@ -64,10 +66,6 @@ public class ContainerTeleportPipe extends BuildCraftContainer {
                 pipe.ownerUUID,
                 pipe.ownerName);
             PacketHandler.INSTANCE.sendTo(message, (EntityPlayerMP) player);
-
-            // save the pipe's old frequency so it can be removed later
-            originalfreq = pipe.getFrequency();
-
         }
     }
 
@@ -86,10 +84,11 @@ public class ContainerTeleportPipe extends BuildCraftContainer {
         int connectedPipesNew = connectedPipes;
         if (ticks % 20 == 0) { // reduce lag
             ticks = 0;
-            Log.debug("Old connected:" + connectedPipesNew);
-            connectedPipesNew = TeleportManager.instance.getConnectedPipes(pipe, !isSendingPipe, isSendingPipe)
+            Log.debug("Old connected: %d", connectedPipesNew);
+            connectedPipesNew = TeleportManager.get()
+                .getConnectedPipes(pipe, !isSendingPipe, isSendingPipe)
                 .size();
-            Log.debug("New connected:" + connectedPipesNew);
+            Log.debug("New connected: %d", connectedPipesNew);
         }
         ticks++;
         for (Object crafter : crafters) {
@@ -127,21 +126,6 @@ public class ContainerTeleportPipe extends BuildCraftContainer {
             case 3:
                 pipe.isPublic = (j == 1);
                 break;
-        }
-    }
-
-    @Override
-    public void onContainerClosed(EntityPlayer player) {
-        super.onContainerClosed(player);
-        if (FMLCommonHandler.instance()
-            .getEffectiveSide() == Side.SERVER) {
-            if (originalfreq != freq) {
-                // remove the pipe from the old frequency
-                TeleportManager.instance.remove(pipe, originalfreq);
-                // re-add the pipe to the new frequency
-                TeleportManager.instance.add(pipe, freq);
-            }
-
         }
     }
 

@@ -1,9 +1,11 @@
-package buildcraft.additionalpipes.network.message;
+package com.mrfuzzihead.additionalpipes.network.message;
 
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.World;
 
-import buildcraft.additionalpipes.pipes.PipeItemsDistributor;
+import com.mrfuzzihead.additionalpipes.pipes.PipeItemsDistributor;
+import com.mrfuzzihead.additionalpipes.utils.PlayerUtils;
+
 import buildcraft.transport.TileGenericPipe;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
@@ -14,9 +16,8 @@ import io.netty.buffer.ByteBuf;
  * Message that sets the properties of a Distribution Pipe from the GUI
  *
  */
-public class MessageDistPipe implements IMessage, IMessageHandler<MessageDistPipe, IMessage> {
+public class MessageDistPipe extends PipePositionMessage implements IMessageHandler<MessageDistPipe, IMessage> {
 
-    public int x, y, z;
     byte _index;
     int _newData;
 
@@ -32,49 +33,42 @@ public class MessageDistPipe implements IMessage, IMessageHandler<MessageDistPip
 
     @Override
     public void fromBytes(ByteBuf buf) {
-        x = buf.readInt();
-        y = buf.readInt();
-        z = buf.readInt();
+        readPosition(buf);
         _index = buf.readByte();
         _newData = buf.readInt();
     }
 
     @Override
     public void toBytes(ByteBuf buf) {
-        buf.writeInt(x);
-        buf.writeInt(y);
-        buf.writeInt(z);
+        writePosition(buf);
         buf.writeByte(_index);
         buf.writeInt(_newData);
     }
 
     @Override
     public IMessage onMessage(MessageDistPipe message, MessageContext ctx) {
-
-        World world = ctx.getServerHandler().playerEntity.worldObj;
-        TileEntity te = world.getTileEntity(message.x, message.y, message.z);
-        if (te instanceof TileGenericPipe) {
-            PipeItemsDistributor pipe = (PipeItemsDistributor) ((TileGenericPipe) te).pipe;
-
-            if (message._newData >= 0 && message._index >= 0 && message._index < pipe.distData.length) {
-                pipe.distData[message._index] = message._newData;
-                boolean found = message._newData > 0;
-                if (!found) {
-                    for (int i = 0; i < pipe.distData.length; i++) {
-                        if (pipe.distData[i] > 0) {
-                            found = true;
-                        }
-                    }
-                }
-                if (!found) {
-                    for (int i = 0; i < pipe.distData.length; i++) {
-                        pipe.distData[i] = 1;
-                    }
-                }
-
-            }
+        EntityPlayerMP player = ctx.getServerHandler().playerEntity;
+        if (player == null || !PlayerUtils.isPlayerNearBlock(player, message.x, message.y, message.z)) {
+            return null;
         }
 
+        // Reject negative values; values above the supported maximum are clamped by setDistData.
+        if (message._index < 0 || message._newData < 0) {
+            return null;
+        }
+
+        World world = player.worldObj;
+        PipeItemsDistributor pipe = message.getPipe(world, PipeItemsDistributor.class);
+        if (pipe == null) {
+            return null;
+        }
+
+        if (pipe.setDistData(message._index, message._newData)) {
+            TileGenericPipe tile = message.getPipeTile(world);
+            if (tile != null) {
+                tile.markDirty();
+            }
+        }
         return null;
     }
 

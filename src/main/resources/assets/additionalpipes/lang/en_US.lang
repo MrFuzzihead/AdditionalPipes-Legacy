@@ -1,7 +1,3 @@
-tile.TeleportTether.name=Teleport Tether
-item.PipeItemsPriorityInsertion.name=Priority Insertion Pipe
-item.PipeItemsAdvancedInsertion.name=[Deprecated] Insertion Transport Pipe
-item.PipeItemsAdvancedWood.name=Adv. Wooden Transport Pipe
 item.PipeItemsGravityFeed.name=Gravity Feed Transport Pipe
 item.PipeItemsDistributor.name=Distribution Transport Pipe
 item.PipeItemsClosed.name=Closed Transport Pipe
@@ -14,41 +10,52 @@ item.PipeSwitchFluids.name=Switch Fluid Pipe
 item.PipeSwitchItems.name=Switch Transport Pipe
 item.PipeLiquidsWaterPump.name=Water Pump Pipe
 item.PipeItemsAddition.name=Addition Transport Pipe
-item.PipeLiquidsObsidian.name=Obsidian Fluid Pipe
-item.PipeItemsJeweled.name=Jeweled Transport Pipe
-
-#regular items & blocks
-item.dogDeaggravator.name=Dog Deaggravator
-tile.teleportTether.name=Teleport Tether
 
 gui.pipeItemsDistributor=Distribution Pipe
-gui.pipeItemsPriorityInsertion=Priority Insertion Pipe
-gui.PipeItemsAdvancedWood=Advanced Wooden Pipe
-gui.jeweled_pipe=Jeweled Pipe
-
-#tab names for the Jeweled Pipe GUI
-gui.tab.up=Up
-gui.tab.down=Down
-gui.tab.north=North
-gui.tab.south=South
-gui.tab.east=East
-gui.tab.west=West
-
-gui.match=Match:
-gui.NBT=Tag
-gui.metadata=Meta
-gui.acceptUnsorted=Accept Unsorted
+gui.pipeItemsClosed=Closed Pipe
 
 gate.pipeClosed=Pipe Closed (Storing Items)
 
-key.lasers=Show chunk load boundaries
-
-#tooltips for teleport pipes
-tip.teleportPipe=No more long pipelines!
-tip.teleportLogisticsPipe=Connects to Logistics Pipes!
-
-tooltip.dogDeaggravator=Calms down your dogs
+# Pipe tooltips. tip.shift.* lines are shown while Shift is held.
+# Fluid pipes automatically append a cyan "N mB/t" line; power pipes append a red "N RF/t" line.
+tip.PipeItemsGravityFeed=Pulls items from the inventory above and sends them down.
+tip.shift.PipeItemsGravityFeed=No power required.\nExtraction rate is configurable.
+tip.PipeItemsDistributor=Splits items between outputs using configurable ratios.
+tip.shift.PipeItemsDistributor=Right-click to set per-side ratios.\nOnly connected sides are used; sides with weight 0 are skipped.
+tip.PipeItemsClosed=Stores items that would otherwise be dropped.
+tip.shift.PipeItemsClosed=Acts as a normal pipe; undeliverable items go into a 9-slot buffer.\nBreaking the pipe drops the buffer.\nEmits the "Pipe Closed" gate trigger while buffering.
+tip.PipeItemsTeleport=Teleports items to other item teleport pipes on the same frequency.
+tip.shift.PipeItemsTeleport=Right-click to set frequency and Send/Receive mode.\nPrivate by default; the owner can make it public.\nGates on the pipe transmit redstone wire signals.
+tip.PipeLiquidsTeleport=Teleports fluids to other fluid teleport pipes on the same frequency.
+tip.shift.PipeLiquidsTeleport=Right-click to set frequency and Send/Receive mode.\nUses the same frequency/state GUI as item teleport pipes.\nGates on the pipe transmit redstone wire signals.
+tip.PipePowerTeleport=Teleports RF to other power teleport pipes on the same frequency.
+tip.shift.PipePowerTeleport=Only a configurable percentage of the power is transmitted.\nRight-click to set frequency and Send/Receive mode.\nGates on the pipe transmit redstone wire signals.
+tip.PipeLogisticsTeleport=Links two Logistics Pipes networks over any distance.
+tip.shift.PipeLogisticsTeleport=Requires exactly one other logistics teleport pipe on the same frequency.\nWrench to switch which side the LP pipeline connects to.
+tip.PipeSwitchItems=Passes items only while unpowered.
+tip.shift.PipeSwitchItems=Disconnects from all sides when powered.\nA cheap redstone-controlled valve; no gate required.
+tip.PipeSwitchFluids=Passes fluids only while unpowered.
+tip.shift.PipeSwitchFluids=Disconnects from all sides when powered.\nGold-tier fluid throughput.
+tip.PipeSwitchPower=Passes RF only while unpowered.
+tip.shift.PipeSwitchPower=Disconnects from all sides when powered.\nBetween iron and gold power throughput.
+tip.PipeLiquidsWaterPump=Generates water from a source block directly below.
+tip.shift.PipeLiquidsWaterPump=Passive; no power required.\nProduction rate is configurable.
+tip.PipeItemsAddition=Inserts items only into inventories that already contain them.
+tip.shift.PipeItemsAddition=Won't insert into empty or unrelated inventories.\nUseful for topping up specific chests or machines.
 
 itemGroup.buildcraft.apcreativetab=Additional Pipes
 
-command.ap.usage=/additionalpipes teleport <items|fluids|power>
+command.ap.usage=/additionalpipes teleport <items|fluids|power|logistics>
+
+gui.teleportPipe.title=Teleport Pipe
+gui.teleportPipe.owner=Owner:
+gui.teleportPipe.outputs=Outputs:
+gui.teleportPipe.inputs=Inputs:
+gui.teleportPipe.frequency=Frequency: %d
+gui.teleportPipe.sendOnly=Send Only
+gui.teleportPipe.receiveOnly=Receive Only
+gui.teleportPipe.sendReceive=Send & Receive
+gui.teleportPipe.disabled=Disabled
+gui.teleportPipe.public=Public
+gui.teleportPipe.private=Private
+gui.teleportPipe.ownerTooltip=Owner: %s

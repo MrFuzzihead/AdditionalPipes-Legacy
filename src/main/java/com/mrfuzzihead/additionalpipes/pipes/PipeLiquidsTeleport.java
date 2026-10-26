@@ -6,7 +6,7 @@
  * granted by the copyright holder.
  */
 
-package buildcraft.additionalpipes.pipes;
+package com.mrfuzzihead.additionalpipes.pipes;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -18,7 +18,8 @@ import net.minecraftforge.fluids.IFluidHandler;
 
 import org.apache.commons.lang3.tuple.Pair;
 
-import buildcraft.additionalpipes.api.PipeType;
+import com.mrfuzzihead.additionalpipes.api.PipeType;
+
 import buildcraft.transport.IPipeTransportFluidsHook;
 import buildcraft.transport.PipeTransportFluids;
 import buildcraft.transport.pipes.PipeFluidsDiamond;
@@ -36,7 +37,8 @@ public class PipeLiquidsTeleport extends PipeTeleport<PipeTransportFluids> imple
 
     @Override
     public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
-        List<PipeLiquidsTeleport> pipeList = TeleportManager.instance.getConnectedPipes(this, false, true);
+        List<PipeLiquidsTeleport> pipeList = TeleportManager.get()
+            .getConnectedPipes(this, false, true);
 
         if (pipeList.size() == 0 || (state & 0x1) == 0) {
             return 0;

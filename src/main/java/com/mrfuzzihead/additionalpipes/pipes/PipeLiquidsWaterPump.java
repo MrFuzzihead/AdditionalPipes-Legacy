@@ -1,4 +1,4 @@
-package buildcraft.additionalpipes.pipes;
+package com.mrfuzzihead.additionalpipes.pipes;
 
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
@@ -8,7 +8,8 @@ import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 
-import buildcraft.additionalpipes.APConfiguration;
+import com.mrfuzzihead.additionalpipes.APConfiguration;
+
 import buildcraft.transport.PipeTransportFluids;
 
 public class PipeLiquidsWaterPump extends APPipe<PipeTransportFluids> {
@@ -26,12 +27,19 @@ public class PipeLiquidsWaterPump extends APPipe<PipeTransportFluids> {
     @Override
     public void updateEntity() {
         super.updateEntity();
-        if (getWorld().getBlock(container.xCoord, container.yCoord - 1, container.zCoord) == water) {
-            transport.fill(
-                ForgeDirection.DOWN,
-                new FluidStack(FluidRegistry.WATER, APConfiguration.waterPumpWaterPerTick),
-                true);
+        if (!shouldPump(
+            getWorld().isRemote,
+            getWorld().getBlock(container.xCoord, container.yCoord - 1, container.zCoord) == water)) {
+            return;
         }
+        transport.fill(
+            ForgeDirection.DOWN,
+            new FluidStack(FluidRegistry.WATER, APConfiguration.waterPumpWaterPerTick),
+            true);
+    }
+
+    static boolean shouldPump(boolean isRemote, boolean waterBelow) {
+        return !isRemote && waterBelow;
     }
 
     @Override

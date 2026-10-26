@@ -1,4 +1,4 @@
-package buildcraft.additionalpipes.gates;
+package com.mrfuzzihead.additionalpipes.gates;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -6,9 +6,10 @@ import java.util.LinkedList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import buildcraft.additionalpipes.AdditionalPipes;
-import buildcraft.additionalpipes.pipes.PipeItemsClosed;
-import buildcraft.additionalpipes.pipes.PipeTeleport;
+import com.mrfuzzihead.additionalpipes.AdditionalPipes;
+import com.mrfuzzihead.additionalpipes.pipes.PipeItemsClosed;
+import com.mrfuzzihead.additionalpipes.pipes.PipeTeleport;
+
 import buildcraft.api.statements.IStatementContainer;
 import buildcraft.api.statements.ITriggerExternal;
 import buildcraft.api.statements.ITriggerInternal;

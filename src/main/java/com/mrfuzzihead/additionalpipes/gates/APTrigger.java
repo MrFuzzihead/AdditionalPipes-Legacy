@@ -1,9 +1,10 @@
-package buildcraft.additionalpipes.gates;
+package com.mrfuzzihead.additionalpipes.gates;
 
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.util.IIcon;
 
-import buildcraft.additionalpipes.textures.Textures;
+import com.mrfuzzihead.additionalpipes.textures.Textures;
+
 import buildcraft.api.statements.IStatement;
 import buildcraft.api.statements.StatementManager;
 import cpw.mods.fml.relauncher.Side;

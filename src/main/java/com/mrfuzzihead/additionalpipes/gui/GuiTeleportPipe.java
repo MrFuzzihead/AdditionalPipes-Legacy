@@ -1,15 +1,17 @@
-package buildcraft.additionalpipes.gui;
+package com.mrfuzzihead.additionalpipes.gui;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.util.StatCollector;
+
+import com.mrfuzzihead.additionalpipes.network.PacketHandler;
+import com.mrfuzzihead.additionalpipes.network.message.MessageTelePipeUpdate;
+import com.mrfuzzihead.additionalpipes.pipes.PipeTeleport;
+import com.mrfuzzihead.additionalpipes.textures.Textures;
 
 import buildcraft.BuildCraftCore;
-import buildcraft.additionalpipes.network.PacketHandler;
-import buildcraft.additionalpipes.network.message.MessageTelePipeUpdate;
-import buildcraft.additionalpipes.pipes.PipeTeleport;
-import buildcraft.additionalpipes.textures.Textures;
 import buildcraft.core.CoreIconProvider;
 import buildcraft.core.lib.gui.GuiBuildCraft;
 import cpw.mods.fml.relauncher.Side;
@@ -35,7 +37,8 @@ public class GuiTeleportPipe extends GuiBuildCraft {
         public void draw(int x, int y) {
             // we have to initialize this here since pipe is not yet set when the constructor is run
             if (networkTitle == null) {
-                networkTitle = ((pipe.state & 0x1) >= 1) ? "Outputs:" : "Inputs:";
+                networkTitle = ((pipe.state & 0x1) >= 1) ? StatCollector.translateToLocal("gui.teleportPipe.outputs")
+                    : StatCollector.translateToLocal("gui.teleportPipe.inputs");
             }
 
             // Draw background
@@ -47,56 +50,37 @@ public class GuiTeleportPipe extends GuiBuildCraft {
 
             if (!isFullyOpened()) return;
 
-            fontRendererObj.drawStringWithShadow("Teleport Pipe", x + 22, y + 8, headerColour);
-            fontRendererObj.drawStringWithShadow("Owner:", x + 22, y + 20, subheaderColour);
+            fontRendererObj.drawStringWithShadow(
+                StatCollector.translateToLocal("gui.teleportPipe.title"),
+                x + 22,
+                y + 8,
+                headerColour);
+            fontRendererObj.drawStringWithShadow(
+                StatCollector.translateToLocal("gui.teleportPipe.owner"),
+                x + 22,
+                y + 20,
+                subheaderColour);
             fontRendererObj.drawString(pipe.ownerName, x + 22, y + 32, textColour);
             fontRendererObj.drawStringWithShadow(networkTitle, x + 22, y + 44, subheaderColour);
             fontRendererObj.drawString(String.valueOf(container.connectedPipes), x + 66, y + 45, textColour);
             int[] net = pipe.network;
             if (net.length > 0) {
-                fontRendererObj.drawString(
-                    new StringBuilder("(").append(net[0])
-                        .append(", ")
-                        .append(net[1])
-                        .append(", ")
-                        .append(net[2])
-                        .append(")")
-                        .toString(),
-                    x + 22,
-                    y + 56,
-                    textColour);
+                fontRendererObj
+                    .drawString(String.format("(%d, %d, %d)", net[0], net[1], net[2]), x + 22, y + 56, textColour);
             }
             if (net.length > 3) {
-                fontRendererObj.drawString(
-                    new StringBuilder("(").append(net[3])
-                        .append(", ")
-                        .append(net[4])
-                        .append(", ")
-                        .append(net[5])
-                        .append(")")
-                        .toString(),
-                    x + 22,
-                    y + 68,
-                    textColour);
+                fontRendererObj
+                    .drawString(String.format("(%d, %d, %d)", net[3], net[4], net[5]), x + 22, y + 68, textColour);
             }
             if (net.length > 6) {
-                fontRendererObj.drawString(
-                    new StringBuilder("(").append(net[6])
-                        .append(", ")
-                        .append(net[7])
-                        .append(", ")
-                        .append(net[8])
-                        .append(")")
-                        .toString(),
-                    x + 22,
-                    y + 80,
-                    textColour);
+                fontRendererObj
+                    .drawString(String.format("(%d, %d, %d)", net[6], net[7], net[8]), x + 22, y + 80, textColour);
             }
         }
 
         @Override
         public String getTooltip() {
-            return "Owner: " + pipe.ownerName;
+            return StatCollector.translateToLocalFormatted("gui.teleportPipe.ownerTooltip", pipe.ownerName);
         }
     }
 
@@ -132,36 +116,34 @@ public class GuiTeleportPipe extends GuiBuildCraft {
     @Override
     protected void drawGuiContainerForegroundLayer(int p1, int p2) {
         super.drawGuiContainerForegroundLayer(p1, p2);
-        fontRendererObj.drawString("Frequency: " + pipe.getFrequency(), 16, 12, 0x404040);
         fontRendererObj.drawString(
-            new StringBuilder("(").append(pipe.container.xCoord)
-                .append(", ")
-                .append(pipe.container.yCoord)
-                .append(", ")
-                .append(pipe.container.zCoord)
-                .append(")")
-                .toString(),
+            StatCollector.translateToLocalFormatted("gui.teleportPipe.frequency", pipe.getFrequency()),
+            16,
+            12,
+            0x404040);
+        fontRendererObj.drawString(
+            String.format("(%d, %d, %d)", pipe.container.xCoord, pipe.container.yCoord, pipe.container.zCoord),
             128,
             12,
             0x404040);
         switch (pipe.state) {
             case 3:
-                buttons[6].displayString = "Send & Receive";
+                buttons[6].displayString = StatCollector.translateToLocal("gui.teleportPipe.sendReceive");
                 break;
             case 2:
-                buttons[6].displayString = "Receive Only";
+                buttons[6].displayString = StatCollector.translateToLocal("gui.teleportPipe.receiveOnly");
                 break;
             case 1:
-                buttons[6].displayString = "Send Only";
+                buttons[6].displayString = StatCollector.translateToLocal("gui.teleportPipe.sendOnly");
                 break;
             default:
-                buttons[6].displayString = "Disabled";
+                buttons[6].displayString = StatCollector.translateToLocal("gui.teleportPipe.disabled");
                 break;
         }
         if (pipe.isPublic) {
-            buttons[7].displayString = "Public";
+            buttons[7].displayString = StatCollector.translateToLocal("gui.teleportPipe.public");
         } else {
-            buttons[7].displayString = "Private";
+            buttons[7].displayString = StatCollector.translateToLocal("gui.teleportPipe.private");
         }
     }
 

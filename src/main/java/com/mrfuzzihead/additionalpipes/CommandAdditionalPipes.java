@@ -1,4 +1,4 @@
-package buildcraft.additionalpipes;
+package com.mrfuzzihead.additionalpipes;
 
 import java.util.Collection;
 
@@ -7,8 +7,8 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.StatCollector;
 
-import buildcraft.additionalpipes.pipes.PipeTeleport;
-import buildcraft.additionalpipes.pipes.TeleportManager;
+import com.mrfuzzihead.additionalpipes.pipes.PipeTeleport;
+import com.mrfuzzihead.additionalpipes.pipes.TeleportManager;
 
 public class CommandAdditionalPipes extends CommandBase {
 
@@ -17,37 +17,48 @@ public class CommandAdditionalPipes extends CommandBase {
         return AdditionalPipes.MODID.toLowerCase();
     }
 
-    @SuppressWarnings("rawtypes")
     @Override
     public void processCommand(ICommandSender sender, String[] args) {
-        if (args.length > 0 && "teleport".equals(args[0])) {
-            // let's be a bit lenient with plurals
+        if (args.length < 2 || !"teleport".equals(args[0])) {
+            return;
+        }
 
-            Collection pipes = null;
+        // let's be a bit lenient with plurals
+        Collection<? extends PipeTeleport<?>> pipes;
+        String type = args[1].toLowerCase();
 
-            if (args[1].equals("items") || args[1].equals("item")) {
-                pipes = TeleportManager.instance.getAllItemPipesInNetwork();
-            } else if (args[1].equals("fluids") || args[1].equals("fluid")) {
-                pipes = TeleportManager.instance.getAllFluidPipesInNetwork();
-            } else if (args[1].equals("power")) {
-                pipes = TeleportManager.instance.getAllFluidPipesInNetwork();
-            } else {
-                return;
-            }
-            sender.addChatMessage(new ChatComponentText("Teleport pipes: "));
-            for (Object pipeObject : pipes) {
-                StringBuffer sb = new StringBuffer();
-                PipeTeleport<?> pipe = (PipeTeleport<?>) pipeObject;
-                sb.append('[');
-                sb.append(pipe.getPosition().x)
-                    .append(", ");
-                sb.append(pipe.getPosition().y)
-                    .append(", ");
-                sb.append(pipe.getPosition().z)
-                    .append("] ");
-                sb.append(pipe.ownerName);
-                sender.addChatMessage(new ChatComponentText(sb.toString()));
-            }
+        if (type.equals("items") || type.equals("item")) {
+            pipes = TeleportManager.get()
+                .getAllItemPipesInNetwork();
+        } else if (type.equals("fluids") || type.equals("fluid")) {
+            pipes = TeleportManager.get()
+                .getAllFluidPipesInNetwork();
+        } else if (type.equals("power")) {
+            pipes = TeleportManager.get()
+                .getAllPowerPipesInNetwork();
+        } else if (type.equals("logistics") || type.equals("logistic")) {
+            pipes = TeleportManager.get()
+                .getAllLogisticsPipesInNetwork();
+        } else {
+            return;
+        }
+
+        sender.addChatMessage(new ChatComponentText("Teleport pipes: "));
+        for (PipeTeleport<?> pipe : pipes) {
+            StringBuilder sb = new StringBuilder();
+            sb.append('[')
+                .append(pipe.getPosition().x)
+                .append(", ")
+                .append(pipe.getPosition().y)
+                .append(", ")
+                .append(pipe.getPosition().z)
+                .append("] dim ")
+                .append(
+                    pipe.getContainer()
+                        .getWorldObj().provider.dimensionId)
+                .append(' ')
+                .append(pipe.ownerName);
+            sender.addChatMessage(new ChatComponentText(sb.toString()));
         }
     }
 

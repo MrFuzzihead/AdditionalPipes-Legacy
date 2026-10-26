@@ -11,3 +11,52 @@ jobs:
   build-and-test:
     uses: GTNewHorizons/GTNH-Actions-Workflows/.github/workflows/build-and-test.yml@master
     secrets: inherit
+
+  selftest:
+    name: Headless server self-test
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 8 for the 1.7.10 run task
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '8'
+
+      - name: Remember JDK 8 path
+        id: jdk8
+        run: echo "path=$JAVA_HOME" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Gradle JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version-file: .java-version
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Register JDK 8 toolchain
+        run: |
+          mkdir -p "$HOME/.gradle"
+          echo "org.gradle.java.installations.paths=${{ steps.jdk8.outputs.path }}" >> "$HOME/.gradle/gradle.properties"
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x gradlew
+
+      - name: Run headless server self-test
+        run: ./gradlew selfTest --no-configuration-cache --stacktrace
+
+      - name: Upload self-test log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: selftest-log
+          path: build/selftest-server/logs/fml-server-latest.log
+          if-no-files-found: warn

@@ -1,65 +1,27 @@
-package buildcraft.additionalpipes;
+package com.mrfuzzihead.additionalpipes;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 
-import net.minecraft.block.Block;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.oredict.ShapedOreRecipe;
 
-import buildcraft.BuildCraftSilicon;
-import buildcraft.BuildCraftTransport;
-import buildcraft.additionalpipes.api.TeleportManagerBase;
-import buildcraft.additionalpipes.chunkloader.BlockChunkLoader;
-import buildcraft.additionalpipes.chunkloader.ChunkLoadingHandler;
-import buildcraft.additionalpipes.chunkloader.TileChunkLoader;
-import buildcraft.additionalpipes.gates.GateProvider;
-import buildcraft.additionalpipes.gates.TriggerPipeClosed;
-import buildcraft.additionalpipes.gui.GuiHandler;
-import buildcraft.additionalpipes.item.ItemDogDeaggravator;
-import buildcraft.additionalpipes.network.PacketHandler;
-import buildcraft.additionalpipes.pipes.APPipe;
-import buildcraft.additionalpipes.pipes.PipeItemsAddition;
-import buildcraft.additionalpipes.pipes.PipeItemsAdvancedInsertion;
-import buildcraft.additionalpipes.pipes.PipeItemsAdvancedWood;
-import buildcraft.additionalpipes.pipes.PipeItemsClosed;
-import buildcraft.additionalpipes.pipes.PipeItemsDistributor;
-import buildcraft.additionalpipes.pipes.PipeItemsGravityFeed;
-import buildcraft.additionalpipes.pipes.PipeItemsJeweled;
-import buildcraft.additionalpipes.pipes.PipeItemsPriorityInsertion;
-import buildcraft.additionalpipes.pipes.PipeItemsTeleport;
-import buildcraft.additionalpipes.pipes.PipeLiquidsObsidian;
-import buildcraft.additionalpipes.pipes.PipeLiquidsTeleport;
-import buildcraft.additionalpipes.pipes.PipeLiquidsWaterPump;
-import buildcraft.additionalpipes.pipes.PipeLogisticsTeleport;
-import buildcraft.additionalpipes.pipes.PipePowerTeleport;
-import buildcraft.additionalpipes.pipes.PipeSwitchFluids;
-import buildcraft.additionalpipes.pipes.PipeSwitchItems;
-import buildcraft.additionalpipes.pipes.PipeSwitchPower;
-import buildcraft.additionalpipes.pipes.TeleportManager;
-import buildcraft.additionalpipes.test.TeleportManagerTest;
-import buildcraft.additionalpipes.textures.Textures;
-import buildcraft.additionalpipes.utils.Log;
-import buildcraft.additionalpipes.utils.PipeCreator;
+import com.mrfuzzihead.additionalpipes.api.TeleportManagerBase;
+import com.mrfuzzihead.additionalpipes.gates.GateProvider;
+import com.mrfuzzihead.additionalpipes.gates.TriggerPipeClosed;
+import com.mrfuzzihead.additionalpipes.gui.GuiHandler;
+import com.mrfuzzihead.additionalpipes.network.PacketHandler;
+import com.mrfuzzihead.additionalpipes.pipes.TeleportManager;
+import com.mrfuzzihead.additionalpipes.selftest.SelfTest;
+import com.mrfuzzihead.additionalpipes.textures.Textures;
+import com.mrfuzzihead.additionalpipes.utils.Log;
+
 import buildcraft.api.statements.ITriggerInternal;
 import buildcraft.api.statements.StatementManager;
 import buildcraft.core.BCCreativeTab;
-import buildcraft.core.recipes.AssemblyRecipeManager;
 import buildcraft.transport.BlockGenericPipe;
-import buildcraft.transport.PipeTransportFluids;
-import buildcraft.transport.PipeTransportPower;
-import buildcraft.transport.pipes.PipeFluidsGold;
-import buildcraft.transport.pipes.PipePowerGold;
-import buildcraft.transport.pipes.PipePowerIron;
-import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -68,38 +30,35 @@ import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.event.FMLServerStartedEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
+import cpw.mods.fml.common.event.FMLServerStoppedEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
-import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 @Mod(
     modid = AdditionalPipes.MODID,
     name = AdditionalPipes.NAME,
-    dependencies = "after:BuildCraft|Transport[7.1.18,);after:BuildCraft|Silicon;after:BuildCraft|Transport;after:BuildCraft|Factory;after:LogisticsPipes",
-    version = AdditionalPipes.VERSION)
+    dependencies = "required-after:BuildCraft|Transport;required-after:BuildCraft|Silicon;after:BuildCraft|Factory;after:LogisticsPipes",
+    version = Tags.VERSION)
 public class AdditionalPipes {
 
     public static final String MODID = "additionalpipes";
     public static final String NAME = "Additional Pipes";
-    public static final String VERSION = "4.7.7";
 
     @Instance(MODID)
     public static AdditionalPipes instance;
 
     @SidedProxy(
-        clientSide = "buildcraft.additionalpipes.MultiPlayerProxyClient",
-        serverSide = "buildcraft.additionalpipes.MultiPlayerProxy")
+        clientSide = "com.mrfuzzihead.additionalpipes.MultiPlayerProxyClient",
+        serverSide = "com.mrfuzzihead.additionalpipes.MultiPlayerProxy")
     public static MultiPlayerProxy proxy;
 
     public File configFile;
 
     public boolean logisticsPipesInstalled;
-
-    // chunk load boundaries
-    public ChunkLoadViewDataProxy chunkLoadViewer;
 
     public BCCreativeTab creativeTab;
 
@@ -110,21 +69,13 @@ public class AdditionalPipes {
     public Item pipeLiquidsRedstone;
     // Redstone
     public Item pipeItemsRedStone;
-    // Advanced Insertion
-    public Item pipeItemsAdvancedInsertion;
-    // Advanced Insertion
+    // Addition
     public Item pipeItemsAddition;
-    // Advanced Wood
-    public Item pipeItemsAdvancedWood;
     // Gravity Feed
     public Item pipeItemsGravityFeed;
     // Distributor
     public Item pipeItemsDistributor;
-    // Jeweled
-    public Item pipeItemsJeweled;
 
-    // priority insertion pipe
-    public Item pipeItemsPriority;
     // Item Teleport
     public Item pipeItemsTeleport;
     // Liquid Teleport
@@ -141,15 +92,10 @@ public class AdditionalPipes {
     public Item pipeLiquidsSwitch;
     // water pump pipe
     public Item pipeLiquidsWaterPump;
-    // obsidian fluid pipe
-    public Item pipeLiquidsObsidian;
-    // chunk loader
-    public Block blockChunkLoader;
-
-    // dog deaggravator
-    public Item dogDeaggravator;
 
     public ITriggerInternal triggerPipeClosed;
+
+    public TeleportManager teleportManager;
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
@@ -168,45 +114,15 @@ public class AdditionalPipes {
     public void init(FMLInitializationEvent event) {
 
         logisticsPipesInstalled = Loader.isModLoaded("LogisticsPipes");
-        // EntityList.addMapping(EntityBetterCat.class, "betterCat", 79, 0xEDCE21, 0x564434);
 
         NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandler());
-
-        if (APConfiguration.enableChunkloader) {
-            Log.info("Registering chunk load handler");
-            ForgeChunkManager.setForcedChunkLoadingCallback(this, new ChunkLoadingHandler());
-            chunkLoadViewer = new ChunkLoadViewDataProxy(APConfiguration.chunkSightRange);
-            FMLCommonHandler.instance()
-                .bus()
-                .register(chunkLoadViewer);
-
-            // register Teleport Tether block
-            blockChunkLoader = new BlockChunkLoader();
-            blockChunkLoader.setBlockName("teleportTether");
-            GameRegistry.registerBlock(blockChunkLoader, ItemBlock.class, "chunkLoader");
-            GameRegistry.registerTileEntity(TileChunkLoader.class, "TeleportTether");
-            GameRegistry.addRecipe(
-                new ShapedOreRecipe(
-                    blockChunkLoader,
-                    "iii",
-                    "iLi",
-                    "ici",
-                    'i',
-                    "ingotIron",
-                    'L',
-                    "gemLapis",
-                    'c',
-                    BuildCraftSilicon.redstoneChipset));
-
-            // the lasers key function depends on the chunk loading code, so it can only be enabled if the chunk loader
-            // is
-            proxy.registerKeyHandler();
-
-        }
 
         proxy.registerRendering();
 
         APConfiguration.loadConfigs(true, configFile);
+
+        teleportManager = new TeleportManager();
+        TeleportManagerBase.INSTANCE = teleportManager;
 
         Log.info("Registering pipes");
         loadPipes();
@@ -217,311 +133,42 @@ public class AdditionalPipes {
         triggerPipeClosed = new TriggerPipeClosed();
         StatementManager.registerTriggerProvider(new GateProvider());
 
-        if (APConfiguration.allowWRRemove) {
-            // Additional Pipes
-            GameRegistry.addShapelessRecipe(new ItemStack(pipeItemsTeleport), new Object[] { pipePowerTeleport });
-            GameRegistry.addShapelessRecipe(new ItemStack(pipeItemsTeleport), new Object[] { pipeLiquidsTeleport });
-
-            if (logisticsPipesInstalled) {
-                GameRegistry
-                    .addShapelessRecipe(new ItemStack(pipeItemsTeleport), new Object[] { pipeLogisticsTeleport });
-            }
-
-            GameRegistry.addShapelessRecipe(new ItemStack(pipeItemsSwitch), new Object[] { pipeLiquidsSwitch });
-            GameRegistry.addShapelessRecipe(new ItemStack(pipeItemsSwitch), new Object[] { pipePowerSwitch });
-
-            // it looks like Buildcraft might be adding these itself. I need to look into removing this. -JS
-
-            // BC Liquid
-            GameRegistry.addShapelessRecipe(
-                new ItemStack(BuildCraftTransport.pipeItemsCobblestone),
-                new Object[] { BuildCraftTransport.pipeFluidsCobblestone });
-            GameRegistry.addShapelessRecipe(
-                new ItemStack(BuildCraftTransport.pipeItemsGold),
-                new Object[] { BuildCraftTransport.pipeFluidsGold });
-            GameRegistry.addShapelessRecipe(
-                new ItemStack(BuildCraftTransport.pipeItemsIron),
-                new Object[] { BuildCraftTransport.pipeFluidsIron });
-            GameRegistry.addShapelessRecipe(
-                new ItemStack(BuildCraftTransport.pipeItemsStone),
-                new Object[] { BuildCraftTransport.pipeFluidsStone });
-            GameRegistry.addShapelessRecipe(
-                new ItemStack(BuildCraftTransport.pipeItemsWood),
-                new Object[] { BuildCraftTransport.pipeFluidsWood });
-            GameRegistry.addShapelessRecipe(
-                new ItemStack(BuildCraftTransport.pipeItemsDiamond),
-                new Object[] { BuildCraftTransport.pipeFluidsDiamond });
-            GameRegistry.addShapelessRecipe(
-                new ItemStack(BuildCraftTransport.pipeItemsEmerald),
-                new Object[] { BuildCraftTransport.pipeFluidsEmerald });
-
-            // BC Power
-            GameRegistry.addShapelessRecipe(
-                new ItemStack(BuildCraftTransport.pipeItemsGold),
-                new Object[] { BuildCraftTransport.pipePowerGold });
-            GameRegistry.addShapelessRecipe(
-                new ItemStack(BuildCraftTransport.pipeItemsStone),
-                new Object[] { BuildCraftTransport.pipePowerStone });
-            GameRegistry.addShapelessRecipe(
-                new ItemStack(BuildCraftTransport.pipeItemsWood),
-                new Object[] { BuildCraftTransport.pipePowerWood });
-            GameRegistry.addShapelessRecipe(
-                new ItemStack(BuildCraftTransport.pipeItemsCobblestone),
-                new Object[] { BuildCraftTransport.pipePowerCobblestone });
-            GameRegistry.addShapelessRecipe(
-                new ItemStack(BuildCraftTransport.pipeItemsEmerald),
-                new Object[] { BuildCraftTransport.pipePowerEmerald });
-            GameRegistry.addShapelessRecipe(
-                new ItemStack(BuildCraftTransport.pipeItemsDiamond),
-                new Object[] { BuildCraftTransport.pipePowerDiamond });
-            GameRegistry.addShapelessRecipe(
-                new ItemStack(BuildCraftTransport.pipeItemsQuartz),
-                new Object[] { BuildCraftTransport.pipePowerQuartz });
-
-        }
-
-        dogDeaggravator = new ItemDogDeaggravator();
-        GameRegistry.registerItem(dogDeaggravator, ItemDogDeaggravator.NAME);
-        GameRegistry.addRecipe(
-            new ShapedOreRecipe(
-                dogDeaggravator,
-                "gsg",
-                "gig",
-                "g g",
-                'i',
-                "ingotIron",
-                'g',
-                "ingotGold",
-                's',
-                "stickWood"));
-
-        Log.info("Running Teleport Manager Tests");
-        TeleportManagerTest.runAllTests();
-
-        // set the reference in the API
-        TeleportManagerBase.INSTANCE = TeleportManager.instance;
+        RecipeRegistry.registerRemovalRecipes(this);
     }
 
     @EventHandler
     public void postInit(FMLPostInitializationEvent event) {
-        // For Logistics Pipes compatibility
-
-        if (logisticsPipesInstalled) {
-            // would like to do this, but it causes a NoClassDefFoundError if LP is not installed
-            // SimpleServiceLocator.specialpipeconnection.registerHandler(new APSpecialPipedConnection());
-
-            Log.info("Commencing morass of reflection to try and integrate with Logistics Pipes");
-            boolean success = false;
-            try {
-                // all of this to call ONE function
-                // in a class which may or may not be present
-                Class<?> SimpleServiceLocator = Class.forName("logisticspipes.proxy.SimpleServiceLocator");
-                Class<?> SpecialPipeConnection = Class
-                    .forName("logisticspipes.proxy.specialconnection.SpecialPipeConnection");
-                Class<?> ISpecialPipedConnection = Class
-                    .forName("logisticspipes.interfaces.routing.ISpecialPipedConnection");
-                Class<?> APSpecialPipedConnection = Class
-                    .forName("buildcraft.additionalpipes.pipes.APSpecialPipedConnection");
-
-                Field specialpipeconnectionField = SimpleServiceLocator.getDeclaredField("specialpipeconnection");
-                Object specialpipeconnection = specialpipeconnectionField.get(null);
-                Method registerHandler = SpecialPipeConnection
-                    .getDeclaredMethod("registerHandler", ISpecialPipedConnection);
-                Object apSpecialPC = APSpecialPipedConnection.newInstance();
-                registerHandler.invoke(specialpipeconnection, apSpecialPC);
-
-                success = true;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            Log.info("Integration " + (success ? "succeeded" : "failed"));
-        } else {
-            Log.info("Logistics Pipes not detected");
-        }
+        LPCompat.register(logisticsPipesInstalled);
     }
 
     @EventHandler
     public void onServerStart(FMLServerStartingEvent event) {
         event.registerServerCommand(new CommandAdditionalPipes());
-        TeleportManager.instance.reset();
+        if (teleportManager == null) {
+            teleportManager = new TeleportManager();
+        }
+        TeleportManagerBase.INSTANCE = teleportManager;
+        teleportManager.reset();
+    }
+
+    @EventHandler
+    public void onServerStopped(FMLServerStoppedEvent event) {
+        if (teleportManager != null) {
+            teleportManager.reset();
+        }
+        TeleportManagerBase.INSTANCE = null;
+        teleportManager = null;
+    }
+
+    @EventHandler
+    public void onServerStarted(FMLServerStartedEvent event) {
+        if (Boolean.getBoolean("additionalpipes.selftest")) {
+            SelfTest.run();
+        }
     }
 
     private void loadPipes() {
-        // Item Teleport Pipe
-        pipeItemsTeleport = PipeCreator
-            .createPipeTooltip((Class<? extends APPipe<?>>) PipeItemsTeleport.class, "tip.teleportPipe");
-
-        AssemblyRecipeManager.INSTANCE.addRecipe(
-            "teleportPipe",
-            10000,
-            new ItemStack(pipeItemsTeleport, 8),
-            new Object[] { new ItemStack(BuildCraftSilicon.redstoneChipset, 1, 4),
-                new ItemStack(BuildCraftTransport.pipeItemsDiamond, 8),
-                new ItemStack(BuildCraftSilicon.redstoneChipset, 1, 3) });
-
-        // Liquid Teleport Pipe
-        pipeLiquidsTeleport = PipeCreator
-            .createPipeTooltip((Class<? extends APPipe<?>>) PipeLiquidsTeleport.class, "tip.teleportPipe");
-        if (pipeItemsTeleport != null) {
-            GameRegistry.addShapelessRecipe(
-                new ItemStack(pipeLiquidsTeleport),
-                new Object[] { BuildCraftTransport.pipeWaterproof, pipeItemsTeleport });
-        }
-
-        // Power Teleport Pipe
-
-        pipePowerTeleport = PipeCreator
-            .createPipeTooltip((Class<? extends APPipe<?>>) PipePowerTeleport.class, "tip.teleportPipe");
-        if (pipeItemsTeleport != null) {
-            GameRegistry.addShapelessRecipe(
-                new ItemStack(pipePowerTeleport),
-                new Object[] { Items.redstone, pipeItemsTeleport });
-        }
-
-        if (logisticsPipesInstalled) {
-            // Logistics Teleport Pipe
-            pipeLogisticsTeleport = PipeCreator.createPipeTooltip(
-                (Class<? extends APPipe<?>>) PipeLogisticsTeleport.class,
-                "tip.teleportLogisticsPipe");
-            if (pipeItemsTeleport != null) {
-                GameRegistry.addShapelessRecipe(
-                    new ItemStack(pipeLogisticsTeleport),
-                    new Object[] { pipeItemsTeleport, BuildCraftSilicon.redstoneChipset });
-            }
-        }
-
-        // Jeweled Pipe
-        pipeItemsJeweled = PipeCreator.createPipeAndRecipe(
-            2,
-            PipeItemsJeweled.class,
-            false,
-            " D ",
-            "DGD",
-            " D ",
-            'D',
-            BuildCraftTransport.pipeItemsDiamond,
-            'G',
-            "gearGold");
-
-        // Distributor Pipe
-        pipeItemsDistributor = PipeCreator.createPipeAndRecipe(
-            1,
-            PipeItemsDistributor.class,
-            false,
-            " r ",
-            "IgI",
-            'r',
-            "dustRedstone",
-            'I',
-            "ingotIron",
-            'g',
-            "blockGlass");
-
-        // Advanced Insertion Pipe
-        pipeItemsAdvancedInsertion = PipeCreator
-            .createPipeAndRecipe(8, PipeItemsAdvancedInsertion.class, false, "IgI", 'I', "gearIron", 'g', "blockGlass");
-
-        // Advanced Insertion Pipe
-        pipeItemsAddition = PipeCreator.createPipeAndRecipe(
-            1,
-            PipeItemsAddition.class,
-            false,
-            " R ",
-            "RIR",
-            " R ",
-            'I',
-            pipeItemsAdvancedInsertion,
-            'R',
-            "dustRedstone");
-
-        pipeItemsPriority = PipeCreator.createPipeAndRecipe(
-            2,
-            PipeItemsPriorityInsertion.class,
-            true,
-            pipeItemsDistributor,
-            pipeItemsAdvancedInsertion);
-
-        // Advanced Wooden Pipe
-        pipeItemsAdvancedWood = PipeCreator
-            .createPipeAndRecipe(8, PipeItemsAdvancedWood.class, false, "WgW", 'W', "gearWood", 'g', "blockGlass");
-
-        // Gravity Feed Pipe
-        pipeItemsGravityFeed = PipeCreator.createPipeAndRecipe(
-            1,
-            PipeItemsGravityFeed.class,
-            false,
-            "   ",
-            "IgI",
-            " I ",
-            'S',
-            "stone",
-            'I',
-            "ingotIron",
-            'g',
-            "blockGlass");
-
-        // Closed Items Pipe
-        pipeItemsClosed = PipeCreator
-            .createPipeAndRecipe(1, PipeItemsClosed.class, true, BuildCraftTransport.pipeItemsVoid, "gearIron");
-
-        // switch pipes
-        pipeItemsSwitch = PipeCreator.createPipeAndRecipe(
-            8,
-            PipeSwitchItems.class,
-            false,
-            "GgI",
-            'g',
-            "blockGlass",
-            'G',
-            "gearGold",
-            'I',
-            "gearIron");
-
-        // set power capacity to the average between iron and gold
-        int switchPowerCapacity = (PipeTransportPower.powerCapacities.get(PipePowerGold.class)
-            + PipeTransportPower.powerCapacities.get(PipePowerIron.class)) / 2;
-
-        PipeTransportPower.powerCapacities.put(PipeSwitchPower.class, switchPowerCapacity);
-        pipePowerSwitch = PipeCreator
-            .createPipeAndRecipe(1, PipeSwitchPower.class, true, pipeItemsSwitch, "dustRedstone");
-
-        int switchFluidCapacity = PipeTransportFluids.fluidCapacities.get(PipeFluidsGold.class);
-
-        PipeTransportFluids.fluidCapacities.put(PipeSwitchFluids.class, switchFluidCapacity);
-        pipeLiquidsSwitch = PipeCreator
-            .createPipeAndRecipe(1, PipeSwitchFluids.class, true, pipeItemsSwitch, BuildCraftTransport.pipeWaterproof);
-
-        // water pump pipe
-        // set fluid capacity
-        PipeTransportFluids.fluidCapacities.put(PipeLiquidsWaterPump.class, APConfiguration.waterPumpWaterPerTick);
-        pipeLiquidsWaterPump = PipeCreator.createPipeAndRecipe(
-            1,
-            PipeLiquidsWaterPump.class,
-            false,
-            " L ",
-            "rPr",
-            " W ",
-            'r',
-            "dustRedstone",
-            'P',
-            "gearIron",
-            'L',
-            BuildCraftTransport.pipeFluidsGold,
-            'w',
-            BuildCraftTransport.pipeWaterproof,
-            'W',
-            BuildCraftTransport.pipeFluidsWood);
-
-        // obsidian fluid pipe
-        // set fluid capacity
-        PipeTransportFluids.fluidCapacities.put(PipeLiquidsObsidian.class, 100);
-        pipeLiquidsObsidian = PipeCreator.createPipeAndRecipe(
-            1,
-            PipeLiquidsObsidian.class,
-            true,
-            BuildCraftTransport.pipeItemsObsidian,
-            BuildCraftTransport.pipeWaterproof);
+        PipeRegistry.loadPipes(this);
     }
 
     // legacy method

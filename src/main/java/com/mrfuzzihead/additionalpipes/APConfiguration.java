@@ -1,24 +1,21 @@
-package buildcraft.additionalpipes;
+package com.mrfuzzihead.additionalpipes;
 
 import java.io.File;
 
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 
-import buildcraft.additionalpipes.utils.Log;
+import com.mrfuzzihead.additionalpipes.utils.Log;
 
 public class APConfiguration {
 
-    public static int chunkSightRange; // config option
-
-    public static boolean chunkSightAutorefresh = true;
-
     public static boolean enableDebugLog;
 
-    public static boolean enableChunkloader;
+    static final int MIN_WATER_PUMP_RATE = 1;
+    static final int MAX_WATER_PUMP_RATE = 1000;
+    static final int MIN_GRAVITY_FEED_TICKS = 1;
+    static final int MAX_GRAVITY_FEED_TICKS = 1200;
 
-    // keybinding
-    public static int laserKeyCode; // config option (& in options menu)
     // misc
     public static boolean allowWRRemove;
 
@@ -27,8 +24,6 @@ public class APConfiguration {
     public static int waterPumpWaterPerTick; // in millibuckets / tick
 
     public static int gravityFeedPipeTicksPerPull;
-
-    public static boolean enableTriggers = true;
 
     // set from config
     public static boolean filterRightclicks = false;
@@ -50,14 +45,6 @@ public class APConfiguration {
                 powerTransmittanceCfg = 0.0f;
             }
 
-            Property chunkSightRangeProperty = config.get(Configuration.CATEGORY_GENERAL, "chunkSightRange", 8);
-            chunkSightRangeProperty.comment = "Range of chunk load boundaries.";
-            chunkSightRange = chunkSightRangeProperty.getInt();
-
-            Property laserKey = config.get(Configuration.CATEGORY_GENERAL, "laserKeyChar", 68);
-            laserKey.comment = "Default key to toggle chunk load boundaries.";
-            laserKeyCode = laserKey.getInt();
-
             Property filterRightclicksProperty = config.get(Configuration.CATEGORY_GENERAL, "filterRightclicks", false);
             filterRightclicksProperty.comment = "When right clicking on something with a gui, do not show the gui if you have a pipe in your hand";
             filterRightclicks = filterRightclicksProperty.getBoolean();
@@ -72,20 +59,24 @@ public class APConfiguration {
 
             Property waterPerTickProperty = config.get(Configuration.CATEGORY_GENERAL, "waterPumpWaterPerTick", 90);
             waterPerTickProperty.comment = "Amount of water the Water Pump Pipe produces in millibuckets/tick";
-            waterPumpWaterPerTick = waterPerTickProperty.getInt();
+            waterPumpWaterPerTick = clampWaterPumpRate(waterPerTickProperty.getInt());
 
             Property gpPullRateProperty = config.get(Configuration.CATEGORY_GENERAL, "gravityFeedPipeTicksPerPull", 48);
             gpPullRateProperty.comment = "How many ticks the Gravity Feed Pipe needs to extract an item";
-            gravityFeedPipeTicksPerPull = gpPullRateProperty.getInt();
-
-            Property enableChunkloaderProperty = config.get(Configuration.CATEGORY_GENERAL, "enableChunkloader", true);
-            enableChunkloaderProperty.comment = "Whether or not the chunkloader is added as a block";
-            enableChunkloader = enableChunkloaderProperty.getBoolean();
+            gravityFeedPipeTicksPerPull = clampGravityFeedTicks(gpPullRateProperty.getInt());
         } catch (Exception e) {
             Log.error("Error loading Additional Pipes configs." + e);
         } finally {
             config.save();
         }
+    }
+
+    static int clampWaterPumpRate(int value) {
+        return Math.max(MIN_WATER_PUMP_RATE, Math.min(MAX_WATER_PUMP_RATE, value));
+    }
+
+    static int clampGravityFeedTicks(int value) {
+        return Math.max(MIN_GRAVITY_FEED_TICKS, Math.min(MAX_GRAVITY_FEED_TICKS, value));
     }
 
 }

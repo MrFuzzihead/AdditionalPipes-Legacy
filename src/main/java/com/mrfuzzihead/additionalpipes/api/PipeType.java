@@ -1,4 +1,4 @@
-package buildcraft.additionalpipes.api;
+package com.mrfuzzihead.additionalpipes.api;
 
 public enum PipeType {
     ITEMS,

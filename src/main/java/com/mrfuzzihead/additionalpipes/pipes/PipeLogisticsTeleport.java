@@ -6,7 +6,7 @@
  * granted by the copyright holder.
  */
 
-package buildcraft.additionalpipes.pipes;
+package com.mrfuzzihead.additionalpipes.pipes;
 
 import java.util.List;
 
@@ -14,8 +14,10 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import buildcraft.additionalpipes.api.PipeType;
-import buildcraft.additionalpipes.utils.Log;
+import com.mrfuzzihead.additionalpipes.api.PipeType;
+import com.mrfuzzihead.additionalpipes.utils.Log;
+import com.mrfuzzihead.additionalpipes.utils.TeleportTag;
+
 import buildcraft.api.core.Position;
 import buildcraft.api.tools.IToolWrench;
 import buildcraft.transport.pipes.events.PipeEventItem;
@@ -31,6 +33,11 @@ public class PipeLogisticsTeleport extends PipeTeleport<PipeTransportItemsLogist
 
     public void eventHandler(PipeEventItem.Entered event) {
         if (getWorld().isRemote) {
+            return;
+        }
+
+        if (event.item.hasExtraData() && TeleportTag.consume(event.item.getExtraData())) {
+            // this item was just delivered here by the paired teleport pipe
             return;
         }
 
@@ -50,6 +57,7 @@ public class PipeLogisticsTeleport extends PipeTeleport<PipeTransportItemsLogist
 
         ForgeDirection newOrientation = otherPipe.getOpenOrientation()
             .getOpposite();
+        TeleportTag.mark(event.item.getExtraData(), getFrequency());
         otherPipe.transport.injectItem(event.item, newOrientation);
 
         // ForgeDirection newOrientation = otherPipe.getOpenOrientation().getOpposite();
@@ -77,7 +85,7 @@ public class PipeLogisticsTeleport extends PipeTeleport<PipeTransportItemsLogist
         // return;
         // }
 
-        Log.debug(event.item + " from " + getPosition() + " to " + otherPipe.getPosition() + " " + newOrientation);
+        Log.debug("%s from %s to %s %s", event.item, getPosition(), otherPipe.getPosition(), newOrientation);
         event.cancelled = true;
     }
 
@@ -87,8 +95,11 @@ public class PipeLogisticsTeleport extends PipeTeleport<PipeTransportItemsLogist
     }
 
     public PipeLogisticsTeleport getConnectedPipe() {
-        List<PipeLogisticsTeleport> connectedPipes = TeleportManager.instance
-            .<PipeLogisticsTeleport>getConnectedPipes(this, true, true);
+        TeleportManager manager = TeleportManager.getOrNull();
+        if (manager == null) {
+            return null;
+        }
+        List<PipeLogisticsTeleport> connectedPipes = manager.<PipeLogisticsTeleport>getConnectedPipes(this, true, true);
         if (connectedPipes.size() == 0) {
             return null;
         } else if (connectedPipes.size() > 1) {
@@ -106,8 +117,10 @@ public class PipeLogisticsTeleport extends PipeTeleport<PipeTransportItemsLogist
             .getItem() : null;
         if (equipped instanceof IToolWrench
             && ((IToolWrench) equipped).canWrench(entityplayer, container.xCoord, container.yCoord, container.zCoord)) {
-            transport.switchSource();
-            ((IToolWrench) equipped).wrenchUsed(entityplayer, container.xCoord, container.yCoord, container.zCoord);
+            if (!entityplayer.worldObj.isRemote) {
+                transport.switchSource();
+                ((IToolWrench) equipped).wrenchUsed(entityplayer, container.xCoord, container.yCoord, container.zCoord);
+            }
             return true;
         } else {
             return super.blockActivated(entityplayer, direction);

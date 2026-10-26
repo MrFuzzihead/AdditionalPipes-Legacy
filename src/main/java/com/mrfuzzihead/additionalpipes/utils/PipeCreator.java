@@ -1,15 +1,17 @@
-package buildcraft.additionalpipes.utils;
+package com.mrfuzzihead.additionalpipes.utils;
+
+import java.util.Locale;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 
-import buildcraft.additionalpipes.AdditionalPipes;
-import buildcraft.additionalpipes.item.ItemPipeAP;
-import buildcraft.additionalpipes.pipes.APPipe;
+import com.mrfuzzihead.additionalpipes.AdditionalPipes;
+import com.mrfuzzihead.additionalpipes.item.ItemPipeAP;
+import com.mrfuzzihead.additionalpipes.pipes.PipeTeleport;
+
 import buildcraft.transport.BlockGenericPipe;
-import buildcraft.transport.ItemPipe;
 import buildcraft.transport.Pipe;
 import cpw.mods.fml.common.registry.GameRegistry;
 
@@ -47,24 +49,20 @@ public class PipeCreator {
      * @return
      */
     public static Item createPipe(Class<? extends Pipe<?>> clas) {
-        Item res = BlockGenericPipe.registerPipe(clas, AdditionalPipes.instance.creativeTab);
-        res.setUnlocalizedName(clas.getSimpleName());
-        AdditionalPipes.proxy.registerPipeRendering(res);
-        return res;
-    }
+        ItemPipeAP item = new ItemPipeAP(clas);
 
-    public static Item createPipeTooltip(Class<? extends APPipe<?>> clas, String tooltip) {
-        // we need to use our own version of ItemPipe with tooltip support
-        ItemPipe item = new ItemPipeAP(tooltip);
+        // Preserve the registry names used before tooltip support was added. Teleport pipes were always registered
+        // under their class name; the other pipes were registered by BuildCraft as buildcraftPipe.<lowercase>.
+        String registryName = PipeTeleport.class.isAssignableFrom(clas) ? clas.getSimpleName()
+            : "buildcraftPipe." + clas.getSimpleName()
+                .toLowerCase(Locale.ENGLISH);
+        GameRegistry.registerItem(item, registryName);
+
+        // Display name/lang key; set after registration as the old BlockGenericPipe.registerPipe path did.
         item.setUnlocalizedName(clas.getSimpleName());
         AdditionalPipes.proxy.registerPipeRendering(item);
         BlockGenericPipe.pipes.put(item, clas);
-
-        GameRegistry.registerItem(item, item.getUnlocalizedName());
-
         AdditionalPipes.proxy.createPipeSpecial(item, clas);
-
         return item;
     }
-
 }

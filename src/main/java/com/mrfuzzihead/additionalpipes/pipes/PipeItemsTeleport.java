@@ -6,7 +6,7 @@
  * granted by the copyright holder.
  */
 
-package buildcraft.additionalpipes.pipes;
+package com.mrfuzzihead.additionalpipes.pipes;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -14,8 +14,10 @@ import java.util.List;
 import net.minecraft.item.Item;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import buildcraft.additionalpipes.api.PipeType;
-import buildcraft.additionalpipes.utils.Log;
+import com.mrfuzzihead.additionalpipes.api.PipeType;
+import com.mrfuzzihead.additionalpipes.utils.Log;
+import com.mrfuzzihead.additionalpipes.utils.TeleportTag;
+
 import buildcraft.api.core.Position;
 import buildcraft.transport.PipeTransportItems;
 import buildcraft.transport.pipes.events.PipeEventItem;
@@ -34,17 +36,13 @@ public class PipeItemsTeleport extends PipeTeleport<PipeTransportItems> {
             return;
         }
 
-        if (event.item.hasExtraData()) {
-            if (event.item.getExtraData()
-                .hasKey("justTeleported")) {
-                // this was sent to us by another teleport pipe
-                event.item.getExtraData()
-                    .removeTag("justTeleported");
-                return;
-            }
+        if (event.item.hasExtraData() && TeleportTag.consume(event.item.getExtraData())) {
+            // this was sent to us by another teleport pipe
+            return;
         }
 
-        List<PipeItemsTeleport> connectedTeleportPipes = TeleportManager.instance.getConnectedPipes(this, false, true);
+        List<PipeItemsTeleport> connectedTeleportPipes = TeleportManager.get()
+            .getConnectedPipes(this, false, true);
 
         // no teleport pipes connected, use default
         if (connectedTeleportPipes.size() <= 0 || (state & 0x1) == 0) {
@@ -98,15 +96,14 @@ public class PipeItemsTeleport extends PipeTeleport<PipeTransportItems> {
         insertPoint.moveForwards(0.5);
         event.item.setPosition(insertPoint.x, insertPoint.y, insertPoint.z);
 
-        // add the NBT tag to the item to let the receiving pipe know not to send the item back
-        event.item.getExtraData()
-            .setInteger("justTeleported", getFrequency());
+        // add the marker to the item to let the receiving pipe know not to send the item back
+        TeleportTag.mark(event.item.getExtraData(), getFrequency());
 
         ForgeDirection newOrientation = otherPipe.getOpenOrientation()
             .getOpposite();
         ((PipeTransportItems) otherPipe.transport).injectItem(event.item, newOrientation);
 
-        Log.debug(event.item + " from " + getPosition() + " to " + otherPipe.getPosition() + " " + newOrientation);
+        Log.debug("%s from %s to %s %s", event.item, getPosition(), otherPipe.getPosition(), newOrientation);
         event.cancelled = true;
     }
 
