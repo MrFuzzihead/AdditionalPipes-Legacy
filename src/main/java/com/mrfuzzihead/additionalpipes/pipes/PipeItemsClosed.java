@@ -1,4 +1,4 @@
-package buildcraft.additionalpipes.pipes;
+package com.mrfuzzihead.additionalpipes.pipes;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -8,21 +8,19 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import buildcraft.additionalpipes.AdditionalPipes;
-import buildcraft.additionalpipes.gui.GuiHandler;
-import buildcraft.core.lib.inventory.Transactor;
-import buildcraft.core.lib.inventory.TransactorSimple;
-import buildcraft.core.lib.utils.Utils;
+import com.mrfuzzihead.additionalpipes.AdditionalPipes;
+import com.mrfuzzihead.additionalpipes.gui.GuiHandler;
+
+import buildcraft.core.lib.inventory.InvUtils;
 import buildcraft.transport.PipeTransportItems;
 import buildcraft.transport.pipes.events.PipeEventItem;
 
 public class PipeItemsClosed extends APPipe<PipeTransportItems> implements IInventory {
 
-    private ItemStack[] inventory = new ItemStack[10];
+    private final ClosedPipeBuffer buffer = new ClosedPipeBuffer();
 
     public PipeItemsClosed(Item item) {
         super(new PipeTransportItems(), item);
-        // ((PipeTransportItems) transport).travelHook = this;
     }
 
     @Override
@@ -45,25 +43,22 @@ public class PipeItemsClosed extends APPipe<PipeTransportItems> implements IInve
     @Override
     public void dropContents() {
         super.dropContents();
-        Utils.preDestroyBlock(getWorld(), container.xCoord, container.yCoord, container.zCoord);
+        InvUtils.dropItems(getWorld(), this, container.xCoord, container.yCoord, container.zCoord);
+        InvUtils.wipeInventory(this);
     }
 
     public void eventHandler(PipeEventItem.DropItem event) {
-        Transactor transactor = new TransactorSimple(this);
-        transactor.add(
-            event.item.getItemStack()
-                .copy(),
-            ForgeDirection.UNKNOWN,
-            true);
-        if (inventory[inventory.length - 1] != null) {
-            for (int i = 1; i < inventory.length; i++) {
-                inventory[i - 1] = inventory[i];
+        ItemStack stack = event.item.getItemStack();
+        if (stack != null && stack.stackSize > 0) {
+            buffer.insert(stack);
+            stack.stackSize = 0;
+            markDirty();
+            if (container != null) {
+                container.scheduleRenderUpdate();
             }
         }
 
-        inventory[inventory.length - 1] = null;
-        event.item.getItemStack().stackSize = 0;
-        container.scheduleRenderUpdate();
+        // Suppress the world drop in either case.
         event.entity = null;
     }
 
@@ -72,7 +67,8 @@ public class PipeItemsClosed extends APPipe<PipeTransportItems> implements IInve
         super.writeToNBT(nbttagcompound);
         NBTTagList list = new NBTTagList();
 
-        for (ItemStack stack : inventory) {
+        for (int i = 0; i < buffer.size(); i++) {
+            ItemStack stack = buffer.get(i);
             if (stack != null) {
                 NBTTagCompound stackTag = new NBTTagCompound();
                 stack.writeToNBT(stackTag);
@@ -86,12 +82,13 @@ public class PipeItemsClosed extends APPipe<PipeTransportItems> implements IInve
     @Override
     public void readFromNBT(NBTTagCompound nbttagcompound) {
         super.readFromNBT(nbttagcompound);
-        NBTTagList list = nbttagcompound.getTagList("closedInventory", 10);
-        for (int i = 0; i < list.tagCount() && i < inventory.length; i++) {
-            NBTTagCompound stackTag = (NBTTagCompound) list.getCompoundTagAt(i);
-            inventory[i] = ItemStack.loadItemStackFromNBT(stackTag);
-        }
+        buffer.clear();
 
+        NBTTagList list = nbttagcompound.getTagList("closedInventory", 10);
+        for (int i = 0; i < list.tagCount() && i < buffer.size(); i++) {
+            NBTTagCompound stackTag = (NBTTagCompound) list.getCompoundTagAt(i);
+            buffer.set(i, ItemStack.loadItemStackFromNBT(stackTag));
+        }
     }
 
     @Override
@@ -101,33 +98,42 @@ public class PipeItemsClosed extends APPipe<PipeTransportItems> implements IInve
 
     @Override
     public int getSizeInventory() {
-        return inventory.length;
+        return buffer.size();
     }
 
     @Override
     public ItemStack getStackInSlot(int i) {
-        return inventory[i];
+        return buffer.get(i);
     }
 
     @Override
     public ItemStack decrStackSize(int i, int amt) {
-        ItemStack stack = inventory[i].splitStack(amt);
-        if (inventory[i].stackSize == 0) {
-            inventory[i] = null;
+        ItemStack stack = buffer.get(i);
+        if (stack == null) {
+            return null;
+        }
+
+        ItemStack split = stack.splitStack(amt);
+        if (stack.stackSize <= 0) {
+            buffer.set(i, null);
+        }
+        markDirty();
+        return split;
+    }
+
+    @Override
+    public ItemStack getStackInSlotOnClosing(int i) {
+        ItemStack stack = buffer.remove(i);
+        if (stack != null) {
+            markDirty();
         }
         return stack;
     }
 
     @Override
-    public ItemStack getStackInSlotOnClosing(int i) {
-        ItemStack stack = inventory[i];
-        inventory[i] = null;
-        return stack;
-    }
-
-    @Override
     public void setInventorySlotContents(int i, ItemStack stack) {
-        inventory[i] = stack;
+        buffer.set(i, stack);
+        markDirty();
     }
 
     @Override
@@ -157,18 +163,14 @@ public class PipeItemsClosed extends APPipe<PipeTransportItems> implements IInve
 
     @Override
     public void markDirty() {
-        container.markDirty();
-
+        if (container != null && container.getWorldObj() != null && !container.getWorldObj().isRemote) {
+            container.markDirty();
+        }
     }
 
     @Override
-    public void openInventory() {
-
-    }
+    public void openInventory() {}
 
     @Override
-    public void closeInventory() {
-
-    }
-
+    public void closeInventory() {}
 }

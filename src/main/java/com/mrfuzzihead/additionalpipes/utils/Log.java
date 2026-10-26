@@ -1,9 +1,10 @@
-package buildcraft.additionalpipes.utils;
+package com.mrfuzzihead.additionalpipes.utils;
 
 import org.apache.logging.log4j.Level;
 
-import buildcraft.additionalpipes.APConfiguration;
-import buildcraft.additionalpipes.AdditionalPipes;
+import com.mrfuzzihead.additionalpipes.APConfiguration;
+import com.mrfuzzihead.additionalpipes.AdditionalPipes;
+
 import cpw.mods.fml.common.FMLLog;
 
 public class Log {
@@ -22,8 +23,25 @@ public class Log {
         }
     }
 
+    /**
+     * Formatting is deferred until debug logging is enabled, so disabled debug calls do not allocate strings.
+     */
+    public static void debug(String format, Object... args) {
+        if (APConfiguration.enableDebugLog) {
+            log(Level.INFO, String.format(format, args));
+        }
+    }
+
     public static void error(Object object) {
         log(Level.ERROR, object);
+    }
+
+    public static void error(String message, Throwable throwable) {
+        if (throwable == null) {
+            log(Level.ERROR, message);
+        } else {
+            FMLLog.log(AdditionalPipes.NAME, Level.ERROR, throwable, String.valueOf(message));
+        }
     }
 
     public static void unexpected(Object object) {

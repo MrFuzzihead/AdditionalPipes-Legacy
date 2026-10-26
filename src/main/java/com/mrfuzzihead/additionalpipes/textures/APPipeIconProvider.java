@@ -1,4 +1,4 @@
-package buildcraft.additionalpipes.textures;
+package com.mrfuzzihead.additionalpipes.textures;
 
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.util.IIcon;

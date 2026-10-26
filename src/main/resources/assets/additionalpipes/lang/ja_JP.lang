@@ -23,8 +23,6 @@ gate.pipeClosed=パイプが閉鎖(内部にアイテムを貯蔵)
 
 
 #ツールチップ
-tip.teleportPipe=長い配管ともおさらば！
-tip.teleportLogisticsPipe=Logistics Pipesと接続します。
 
 
 itemGroup.buildcraft.apcreativetab=Additional Pipes

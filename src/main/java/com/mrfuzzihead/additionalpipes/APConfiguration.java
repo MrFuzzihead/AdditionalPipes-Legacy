@@ -1,15 +1,20 @@
-package buildcraft.additionalpipes;
+package com.mrfuzzihead.additionalpipes;
 
 import java.io.File;
 
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 
-import buildcraft.additionalpipes.utils.Log;
+import com.mrfuzzihead.additionalpipes.utils.Log;
 
 public class APConfiguration {
 
     public static boolean enableDebugLog;
+
+    static final int MIN_WATER_PUMP_RATE = 1;
+    static final int MAX_WATER_PUMP_RATE = 1000;
+    static final int MIN_GRAVITY_FEED_TICKS = 1;
+    static final int MAX_GRAVITY_FEED_TICKS = 1200;
 
     // misc
     public static boolean allowWRRemove;
@@ -19,8 +24,6 @@ public class APConfiguration {
     public static int waterPumpWaterPerTick; // in millibuckets / tick
 
     public static int gravityFeedPipeTicksPerPull;
-
-    public static boolean enableTriggers = true;
 
     // set from config
     public static boolean filterRightclicks = false;
@@ -56,16 +59,24 @@ public class APConfiguration {
 
             Property waterPerTickProperty = config.get(Configuration.CATEGORY_GENERAL, "waterPumpWaterPerTick", 90);
             waterPerTickProperty.comment = "Amount of water the Water Pump Pipe produces in millibuckets/tick";
-            waterPumpWaterPerTick = waterPerTickProperty.getInt();
+            waterPumpWaterPerTick = clampWaterPumpRate(waterPerTickProperty.getInt());
 
             Property gpPullRateProperty = config.get(Configuration.CATEGORY_GENERAL, "gravityFeedPipeTicksPerPull", 48);
             gpPullRateProperty.comment = "How many ticks the Gravity Feed Pipe needs to extract an item";
-            gravityFeedPipeTicksPerPull = gpPullRateProperty.getInt();
+            gravityFeedPipeTicksPerPull = clampGravityFeedTicks(gpPullRateProperty.getInt());
         } catch (Exception e) {
             Log.error("Error loading Additional Pipes configs." + e);
         } finally {
             config.save();
         }
+    }
+
+    static int clampWaterPumpRate(int value) {
+        return Math.max(MIN_WATER_PUMP_RATE, Math.min(MAX_WATER_PUMP_RATE, value));
+    }
+
+    static int clampGravityFeedTicks(int value) {
+        return Math.max(MIN_GRAVITY_FEED_TICKS, Math.min(MAX_GRAVITY_FEED_TICKS, value));
     }
 
 }

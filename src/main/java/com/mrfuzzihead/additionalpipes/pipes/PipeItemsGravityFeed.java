@@ -1,4 +1,4 @@
-package buildcraft.additionalpipes.pipes;
+package com.mrfuzzihead.additionalpipes.pipes;
 
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
@@ -8,7 +8,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import buildcraft.additionalpipes.APConfiguration;
+import com.mrfuzzihead.additionalpipes.APConfiguration;
+
 import buildcraft.api.core.Position;
 import buildcraft.core.CoreConstants;
 import buildcraft.core.lib.inventory.InvUtils;

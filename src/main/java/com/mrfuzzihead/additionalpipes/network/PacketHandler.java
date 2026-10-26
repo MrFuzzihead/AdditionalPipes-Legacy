@@ -1,9 +1,10 @@
-package buildcraft.additionalpipes.network;
+package com.mrfuzzihead.additionalpipes.network;
 
-import buildcraft.additionalpipes.AdditionalPipes;
-import buildcraft.additionalpipes.network.message.MessageDistPipe;
-import buildcraft.additionalpipes.network.message.MessageTelePipeData;
-import buildcraft.additionalpipes.network.message.MessageTelePipeUpdate;
+import com.mrfuzzihead.additionalpipes.AdditionalPipes;
+import com.mrfuzzihead.additionalpipes.network.message.MessageDistPipe;
+import com.mrfuzzihead.additionalpipes.network.message.MessageTelePipeData;
+import com.mrfuzzihead.additionalpipes.network.message.MessageTelePipeUpdate;
+
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import cpw.mods.fml.relauncher.Side;

@@ -9,6 +9,3 @@ item.PipeSwitchPower.name=Tube de Troca Kinético
 item.PipeSwitchFluids.name=Tube de Troca de Fluido
 item.PipeSwitchItems.name=Tubo de Troca de Transporte
 item.PipeLiquidsWaterPump.name=Tubo da Bomba d'água
-
-
-tip.teleportPipe=Transporta seu material sem a necessidade para uma longa tubulação

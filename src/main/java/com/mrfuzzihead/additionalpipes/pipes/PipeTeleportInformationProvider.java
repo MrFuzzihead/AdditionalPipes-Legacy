@@ -1,4 +1,4 @@
-package buildcraft.additionalpipes.pipes;
+package com.mrfuzzihead.additionalpipes.pipes;
 
 import java.util.List;
 
@@ -136,7 +136,8 @@ public class PipeTeleportInformationProvider implements IPipeInformationProvider
 
     @Override
     public boolean isPowerPipe() {
-        return true;
+        // This adapter represents an item pipe; reporting true makes LP treat it as a power pipe.
+        return false;
     }
 
     @Override
@@ -156,7 +157,7 @@ public class PipeTeleportInformationProvider implements IPipeInformationProvider
 
     @Override
     public boolean acceptItem(LPTravelingItem item, TileEntity from) {
-        if (BlockGenericPipe.isValid(pipe) || pipe.canSend()) {
+        if (BlockGenericPipe.isValid(pipe) && pipe.canSend()) {
             TravelingItem bcItem = null;
             if (item instanceof LPTravelingItemServer) {
                 LPRoutedBCTravelingItem lpBCItem = new LPRoutedBCTravelingItem();
@@ -189,10 +190,16 @@ public class PipeTeleportInformationProvider implements IPipeInformationProvider
 
     @Override
     public void refreshTileCacheOnSide(ForgeDirection side) {
-        TileBuffer[] cache = pipe.container.getTileCache();
-        if (cache != null) {
-            cache[side.ordinal()].refresh();
+        if (side == null || side == ForgeDirection.UNKNOWN) {
+            return;
         }
+
+        TileBuffer[] cache = pipe.container.getTileCache();
+        if (cache == null || side.ordinal() < 0 || side.ordinal() >= cache.length || cache[side.ordinal()] == null) {
+            return;
+        }
+
+        cache[side.ordinal()].refresh();
     }
 
     @Override

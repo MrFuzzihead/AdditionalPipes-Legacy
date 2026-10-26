@@ -1,18 +1,26 @@
-package buildcraft.additionalpipes;
+package com.mrfuzzihead.additionalpipes;
 
 import net.minecraft.item.Item;
+import net.minecraft.world.World;
 import net.minecraftforge.client.MinecraftForgeClient;
-import net.minecraftforge.common.util.ForgeDirection;
 
-import buildcraft.additionalpipes.utils.Log;
+import com.mrfuzzihead.additionalpipes.utils.Log;
+
 import buildcraft.transport.ItemPipe;
 import buildcraft.transport.Pipe;
 import buildcraft.transport.TransportProxyClient;
+import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class MultiPlayerProxyClient extends MultiPlayerProxy {
+
+    @Override
+    public World getClientWorld() {
+        return FMLClientHandler.instance()
+            .getClient().theWorld;
+    }
 
     @Override
     public void registerPipeRendering(Item res) {
@@ -26,14 +34,10 @@ public class MultiPlayerProxyClient extends MultiPlayerProxy {
                 .newInstance(item);
             if (dummyPipe != null) {
                 item.setPipesIcons(dummyPipe.getIconProvider());
-                // TODO look around
-                item.setPipeIconIndex(dummyPipe.getIconIndex(ForgeDirection.VALID_DIRECTIONS[0]));
-                // item.setTextureIndex(dummyPipe.getTextureIndexForItem());
+                item.setPipeIconIndex(dummyPipe.getIconIndexForItem());
             }
         } catch (Exception e) {
-            Log.error("MultiPlayerProxyClient.createPipeSpecial() failed with exception!");
-
-            e.printStackTrace();
+            Log.error("MultiPlayerProxyClient.createPipeSpecial() failed", e);
         }
     }
 }

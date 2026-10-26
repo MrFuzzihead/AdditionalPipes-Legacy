@@ -1,9 +1,12 @@
-package buildcraft.additionalpipes.pipes;
+package com.mrfuzzihead.additionalpipes.pipes;
+
+import java.util.Collections;
+import java.util.IdentityHashMap;
+import java.util.Set;
 
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import buildcraft.additionalpipes.utils.Log;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.transport.BlockGenericPipe;
 import buildcraft.transport.Pipe;
@@ -63,16 +66,7 @@ public class PipeTransportItemsLogistics extends PipeTransportItems {
             return false;
         }
 
-        try {
-            return pipelineEndsinLogisticsPipe(tile, side.getOpposite());
-        }
-        // can this actually happen?
-        // I'm just trying to make sure that it doesn't corrupt your world if it doesn't.
-        catch (StackOverflowError err) {
-            Log.warn("Wow, that's a long, straight pipeline! Gave up looking for logistics pipes!");
-        }
-
-        return false;
+        return pipelineEndsinLogisticsPipe(tile, side.getOpposite());
     }
 
     public void switchSource() {
@@ -85,16 +79,9 @@ public class PipeTransportItemsLogistics extends PipeTransportItems {
             ForgeDirection o = ForgeDirection.VALID_DIRECTIONS[i % 6];
             TileEntity tile = container.getTile(o);
 
-            try {
-                if (pipelineEndsinLogisticsPipe(tile, o.getOpposite())) {
-                    newSide = o.ordinal();
-                    break;
-                }
-            }
-            // can this actually happen?
-            // I'm just trying to make sure that it doesn't corrupt your world if it doesn't.
-            catch (StackOverflowError err) {
-                Log.warn("Wow, that's a long, straight pipeline! Gave up looking for logistics pipes!");
+            if (pipelineEndsinLogisticsPipe(tile, o.getOpposite())) {
+                newSide = o.ordinal();
+                break;
             }
         }
 
@@ -109,40 +96,60 @@ public class PipeTransportItemsLogistics extends PipeTransportItems {
     }
 
     /**
-     * Recursive function for checking valid pipelines
+     * Iterative check for a straight item pipeline ending in a Logistics Pipe. A visited set guards against loops and
+     * avoids the StackOverflowError the old recursive version could hit on large or cyclic networks.
      *
-     * @param start
-     * @param sideConnectedToPrevPipe
-     * @return
+     * @param start                   first tile to inspect
+     * @param sideConnectedToPrevPipe side of {@code start} that connects back to the previous pipe
      */
     public boolean pipelineEndsinLogisticsPipe(TileEntity start, ForgeDirection sideConnectedToPrevPipe) {
-        // found one!
-        if (start instanceof ILPPipeTile) {
-            return true;
-        }
+        Set<TileEntity> visited = Collections.newSetFromMap(new IdentityHashMap<TileEntity, Boolean>());
+        TileEntity current = start;
+        ForgeDirection previousSide = sideConnectedToPrevPipe;
 
-        // another BC pipe
-        else if (start instanceof IPipeTile) {
-            Pipe<?> pipe = (Pipe<?>) ((IPipeTile) start).getPipe();
+        while (current != null) {
+            if (!visited.add(current)) {
+                // A loop of pipes never reaches a logistics pipe.
+                return false;
+            }
+
+            // found one!
+            if (current instanceof ILPPipeTile) {
+                return true;
+            }
+
+            if (!(current instanceof IPipeTile)) {
+                return false;
+            }
+
+            Pipe<?> pipe = (Pipe<?>) ((IPipeTile) current).getPipe();
             if (!BlockGenericPipe.isValid(pipe) || !(pipe.transport instanceof PipeTransportItems)) {
-                // or not?
                 return false;
             }
 
             // if it branches off, then this pipeline isn't valid
-            if (getNumConnectedPipesExceptSide(pipe.container, sideConnectedToPrevPipe) != 1) {
+            if (getNumConnectedPipesExceptSide(pipe.container, previousSide) != 1) {
                 return false;
             }
 
-            // move to next pipe
-            for (ForgeDirection o : ForgeDirection.VALID_DIRECTIONS) {
-                if (pipe.container.isPipeConnected(o) && o != sideConnectedToPrevPipe) {
-
-                    return pipelineEndsinLogisticsPipe(((IPipeTile) start).getNeighborTile(o), o.getOpposite());
+            TileEntity next = null;
+            ForgeDirection nextPreviousSide = ForgeDirection.UNKNOWN;
+            for (ForgeDirection side : ForgeDirection.VALID_DIRECTIONS) {
+                if (side != previousSide && pipe.container.isPipeConnected(side)) {
+                    next = ((IPipeTile) current).getNeighborTile(side);
+                    nextPreviousSide = side.getOpposite();
+                    break;
                 }
             }
+
+            if (next == null) {
+                return false;
+            }
+
+            current = next;
+            previousSide = nextPreviousSide;
         }
-        // trying to connect to anything besides a BC or LP pipe
+
         return false;
     }
 

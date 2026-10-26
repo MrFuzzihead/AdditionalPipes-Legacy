@@ -1,4 +1,4 @@
-package buildcraft.additionalpipes.utils;
+package com.mrfuzzihead.additionalpipes.utils;
 
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;

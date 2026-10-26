@@ -1,4 +1,4 @@
-package buildcraft.additionalpipes.pipes;
+package com.mrfuzzihead.additionalpipes.pipes;
 
 import java.util.ArrayList;
 import java.util.EnumSet;

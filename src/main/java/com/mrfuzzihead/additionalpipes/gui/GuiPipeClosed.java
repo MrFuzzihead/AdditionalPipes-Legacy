@@ -1,4 +1,4 @@
-package buildcraft.additionalpipes.gui;
+package com.mrfuzzihead.additionalpipes.gui;
 
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -6,7 +6,8 @@ import net.minecraft.util.StatCollector;
 
 import org.lwjgl.opengl.GL11;
 
-import buildcraft.additionalpipes.textures.Textures;
+import com.mrfuzzihead.additionalpipes.textures.Textures;
+
 import buildcraft.transport.Pipe;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -20,7 +21,7 @@ public class GuiPipeClosed extends GuiContainer {
 
     @Override
     protected void drawGuiContainerForegroundLayer(int par1, int par2) {
-        fontRendererObj.drawString(StatCollector.translateToLocal("Closed Pipe"), 60, 6, 4210752);
+        fontRendererObj.drawString(StatCollector.translateToLocal("gui.pipeItemsClosed"), 60, 6, 4210752);
         fontRendererObj.drawString(StatCollector.translateToLocal("container.inventory"), 8, ySize - 96 + 2, 4210752);
     }
 

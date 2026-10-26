@@ -1,5 +1,5 @@
 
-package buildcraft.additionalpipes.api;
+package com.mrfuzzihead.additionalpipes.api;
 
 import java.util.ArrayList;
 

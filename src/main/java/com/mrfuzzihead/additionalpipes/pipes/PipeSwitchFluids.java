@@ -1,4 +1,4 @@
-package buildcraft.additionalpipes.pipes;
+package com.mrfuzzihead.additionalpipes.pipes;
 
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;

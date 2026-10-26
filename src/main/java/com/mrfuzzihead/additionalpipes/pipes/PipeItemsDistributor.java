@@ -6,19 +6,20 @@
  * granted by the copyright holder.
  */
 
-package buildcraft.additionalpipes.pipes;
+package com.mrfuzzihead.additionalpipes.pipes;
 
 import java.util.Arrays;
-import java.util.LinkedList;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import buildcraft.additionalpipes.APConfiguration;
-import buildcraft.additionalpipes.AdditionalPipes;
-import buildcraft.additionalpipes.gui.GuiHandler;
+import com.mrfuzzihead.additionalpipes.APConfiguration;
+import com.mrfuzzihead.additionalpipes.AdditionalPipes;
+import com.mrfuzzihead.additionalpipes.gui.GuiHandler;
+
 import buildcraft.transport.PipeTransportItems;
 import buildcraft.transport.pipes.events.PipeEventItem;
 
@@ -52,32 +53,29 @@ public class PipeItemsDistributor extends APPipe<PipeTransportItems> {
     }
 
     public void eventHandler(PipeEventItem.FindDest event) {
-        LinkedList<ForgeDirection> result = new LinkedList<ForgeDirection>();
-
-        // curTick used to be initialized to 0
-        // but the issue was that when the first item stack passes through the pipe, it always sent it downward whether
-        // or not anything was connected
-        // so I changed curTick to be initialized to Integer.MAX_VALUE so that it will look for the correct output. -JS
-        if (curTick >= distData[distSide]) {
-            toNextOpenSide();
+        ItemStack stack = event.item.getItemStack();
+        if (stack == null || stack.stackSize <= 0 || event.destinations.isEmpty()) {
+            return;
         }
 
-        result.add(ForgeDirection.VALID_DIRECTIONS[distSide]);
-        curTick += event.item.getItemStack().stackSize;
+        boolean[] valid = new boolean[6];
+        for (ForgeDirection direction : event.destinations) {
+            valid[direction.ordinal()] = true;
+        }
 
-        event.destinations.clear();
-        event.destinations.addAll(result);
-    }
-
-    private void toNextOpenSide() {
-        curTick = 0;
-        for (int o = 0; o < distData.length; ++o) {
-            distSide = (distSide + 1) % distData.length;
-            if (distData[distSide] > 0 && container.isPipeConnected(ForgeDirection.VALID_DIRECTIONS[distSide])) {
-                break;
+        if (curTick >= distData[distSide] || !valid[distSide]) {
+            int next = DistributorRouting.nextValidSide(distData, distSide, valid);
+            if (next < 0) {
+                // No configured side is currently connected; let BuildCraft route/bounce normally.
+                return;
             }
+            distSide = next;
+            curTick = 0;
         }
-        // no valid inventories found, do nothing
+
+        curTick += stack.stackSize;
+        event.destinations.clear();
+        event.destinations.add(ForgeDirection.VALID_DIRECTIONS[distSide]);
     }
 
     @Override
@@ -106,15 +104,45 @@ public class PipeItemsDistributor extends APPipe<PipeTransportItems> {
         return true;
     }
 
+    public static int clampWeight(int value) {
+        return DistributorRouting.clampWeight(value);
+    }
+
+    /**
+     * Applies a weight to one side. Values are clamped to the supported range and an all-zero configuration is
+     * normalized back to one item per side.
+     *
+     * @return false if the index is invalid.
+     */
+    public boolean setDistData(int index, int value) {
+        if (index < 0 || index >= distData.length) {
+            return false;
+        }
+
+        distData[index] = DistributorRouting.clampWeight(value);
+        boolean found = false;
+        for (int d : distData) {
+            if (d > 0) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            Arrays.fill(distData, 1);
+        }
+        return true;
+    }
+
     private void sanityCheck() {
+        for (int i = 0; i < distData.length; i++) {
+            distData[i] = DistributorRouting.clampWeight(distData[i]);
+        }
         for (int d : distData) {
             if (d > 0) {
                 return;
             }
         }
-        for (int i = 0; i < distData.length; i++) {
-            Arrays.fill(distData, 1);
-        }
+        Arrays.fill(distData, 1);
     }
 
     @Override
@@ -132,8 +160,11 @@ public class PipeItemsDistributor extends APPipe<PipeTransportItems> {
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
 
-        curTick = nbt.getInteger("curTick");
+        curTick = Math.max(0, nbt.getInteger("curTick"));
         distSide = nbt.getInteger("distSide");
+        if (distSide < 0 || distSide >= distData.length) {
+            distSide = 0;
+        }
         for (int i = 0; i < distData.length; i++) {
             distData[i] = nbt.getInteger("distData" + i);
         }

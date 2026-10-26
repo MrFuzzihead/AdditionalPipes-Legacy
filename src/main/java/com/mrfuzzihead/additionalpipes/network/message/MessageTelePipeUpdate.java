@@ -1,11 +1,11 @@
-package buildcraft.additionalpipes.network.message;
+package com.mrfuzzihead.additionalpipes.network.message;
 
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ChatComponentText;
 
-import buildcraft.additionalpipes.pipes.PipeTeleport;
-import buildcraft.transport.TileGenericPipe;
+import com.mrfuzzihead.additionalpipes.pipes.PipeTeleport;
+import com.mrfuzzihead.additionalpipes.utils.PlayerUtils;
+
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
@@ -15,13 +15,12 @@ import io.netty.buffer.ByteBuf;
  * Message that sets the properties of a Teleport Pipe from the GUI
  *
  */
-public class MessageTelePipeUpdate implements IMessage, IMessageHandler<MessageTelePipeUpdate, IMessage> {
+public class MessageTelePipeUpdate extends PipePositionMessage
+    implements IMessageHandler<MessageTelePipeUpdate, IMessage> {
 
-    public int x, y, z;
     int _freq;
     boolean _isPublic;
     byte _state;
-    int _newData;
 
     public MessageTelePipeUpdate() {}
 
@@ -36,9 +35,7 @@ public class MessageTelePipeUpdate implements IMessage, IMessageHandler<MessageT
 
     @Override
     public void fromBytes(ByteBuf buf) {
-        x = buf.readInt();
-        y = buf.readInt();
-        z = buf.readInt();
+        readPosition(buf);
         _freq = buf.readInt();
         _isPublic = buf.readBoolean();
         _state = buf.readByte();
@@ -46,9 +43,7 @@ public class MessageTelePipeUpdate implements IMessage, IMessageHandler<MessageT
 
     @Override
     public void toBytes(ByteBuf buf) {
-        buf.writeInt(x);
-        buf.writeInt(y);
-        buf.writeInt(z);
+        writePosition(buf);
         buf.writeInt(_freq);
         buf.writeBoolean(_isPublic);
         buf.writeByte(_state);
@@ -56,23 +51,25 @@ public class MessageTelePipeUpdate implements IMessage, IMessageHandler<MessageT
 
     @Override
     public IMessage onMessage(MessageTelePipeUpdate message, MessageContext ctx) {
-        TileEntity te = ctx.getServerHandler().playerEntity.worldObj.getTileEntity(message.x, message.y, message.z);
-        if (te instanceof TileGenericPipe) {
-            PipeTeleport<?> pipe = (PipeTeleport<?>) ((TileGenericPipe) te).pipe;
-            // only allow the owner to change pipe state
-            EntityPlayerMP entityPlayer = (EntityPlayerMP) ctx.getServerHandler().playerEntity;
-            if (!PipeTeleport.canPlayerModifyPipe(entityPlayer, pipe)) {
-                entityPlayer.addChatComponentMessage(new ChatComponentText("Sorry, You may not change pipe state."));
-                return null;
-            }
-            int frequency = message._freq;
-            if (frequency < 0) {
-                frequency = 0;
-            }
-            pipe.setFrequency(frequency);
-            pipe.state = (byte) message._state;
-            pipe.isPublic = message._isPublic;
+        EntityPlayerMP entityPlayer = ctx.getServerHandler().playerEntity;
+        if (!PlayerUtils.isPlayerNearBlock(entityPlayer, message.x, message.y, message.z)) {
+            return null;
         }
+
+        PipeTeleport<?> pipe = message.getPipe(entityPlayer.worldObj, PipeTeleport.class);
+        if (pipe == null) {
+            return null;
+        }
+        // only allow the owner (or a creative player / public pipe) to change pipe state
+        if (!PipeTeleport.canPlayerModifyPipe(entityPlayer, pipe)) {
+            entityPlayer.addChatComponentMessage(new ChatComponentText("Sorry, You may not change pipe state."));
+            return null;
+        }
+
+        pipe.setFrequency(Math.max(0, message._freq));
+        pipe.state = (byte) (message._state & 0x3);
+        pipe.isPublic = message._isPublic;
+        pipe.container.markDirty();
 
         return null;
     }

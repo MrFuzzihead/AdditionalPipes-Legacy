@@ -18,6 +18,5 @@ gate.phasedSignalGreen=Зелёный переключаемый сигнал
 gate.phasedSignalYellow=Жёлтый переключаемый сигнал
 
 
-tip.teleportPipe=Больше никаких труб!
 
 command.ap.usage=/additionalpipes teleport [items|fluids|power]

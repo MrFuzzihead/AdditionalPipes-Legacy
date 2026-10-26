@@ -1,11 +1,12 @@
-package buildcraft.additionalpipes.gui;
+package com.mrfuzzihead.additionalpipes.gui;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 
-import buildcraft.additionalpipes.pipes.PipeTeleport;
-import buildcraft.additionalpipes.utils.Log;
+import com.mrfuzzihead.additionalpipes.pipes.PipeTeleport;
+import com.mrfuzzihead.additionalpipes.utils.Log;
+
 import buildcraft.transport.TileGenericPipe;
 import cpw.mods.fml.common.network.IGuiHandler;
 
@@ -23,7 +24,7 @@ public class GuiHandler implements IGuiHandler {
             return null;
         }
 
-        Log.debug("Opening Container " + ID + " on the server");
+        Log.debug("Opening Container %d on the server", ID);
 
         switch (ID) {
             case PIPE_TP:
@@ -44,7 +45,7 @@ public class GuiHandler implements IGuiHandler {
             return null;
         }
 
-        Log.debug("Opening GUI " + ID + " on the client");
+        Log.debug("Opening GUI %d on the client", ID);
 
         switch (ID) {
             case PIPE_TP:

@@ -1,10 +1,11 @@
-package buildcraft.additionalpipes.gui;
+package com.mrfuzzihead.additionalpipes.gui;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ICrafting;
 
-import buildcraft.additionalpipes.pipes.PipeItemsDistributor;
+import com.mrfuzzihead.additionalpipes.pipes.PipeItemsDistributor;
+
 import buildcraft.transport.TileGenericPipe;
 
 public class ContainerDistributionPipe extends Container {
@@ -47,8 +48,6 @@ public class ContainerDistributionPipe extends Container {
 
     @Override
     public void updateProgressBar(int i, int j) {
-        if (i >= 0 && i < pipe.distData.length) {
-            pipe.distData[i] = j;
-        }
+        pipe.setDistData(i, j);
     }
 }

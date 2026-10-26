@@ -1,0 +1,12 @@
+Additional Pipes (Legacy)
+Copyright (c) 2026 Duncan Campbell
+
+The original Additional Pipes source in this repository is licensed under the MIT
+License in LICENSE.
+
+Portions of the source retain the BuildCraft license header. Those portions are
+distributed under the Minecraft Mod Public License 1.0.1, reproduced in
+LICENSE-BUILDCRAFT. The BuildCraft API license is reproduced in LICENSE.API.
+
+BuildCraft is Copyright (c) 2011-2017 SpaceToad and the BuildCraft team.
+Logistics Pipes is an optional dependency and is not bundled.
